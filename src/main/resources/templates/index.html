@@ -1,62 +1,436 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="BookLab - Biblioteca virtual con miles de libros y recursos digitales" />
+    <meta name="keywords" content="libros, biblioteca, virtual, lectura, autores" />
     <title>BookLab</title>
-    <link rel="stylesheet" href="/estilos/principal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS - La mejor librería para responsividad -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ===== RESET Y ESTILOS BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f6fa;
+            color: #2c3e50;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 60px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(6px);
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .logo span {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background-color: #27ae60;
+            color: #fff;
+        }
+
+        .btn-login {
+            background: #27ae60;
+            color: #fff !important;
+            padding: 10px 25px;
+            border-radius: 30px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #219150;
+        }
+
+        /* 🔹 Hero con video - MEJORADO para compatibilidad */
+        .hero {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px;
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Video a pantalla completa dentro del hero */
+        .hero video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        /* Contenido encima del video */
+        .hero-text {
+            position: relative;
+            z-index: 1;
+            max-width: 50%;
+        }
+
+        .hero-text .collection {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .hero-text .title {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero-text .description {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .hero-text .btn {
+            padding: 12px 25px;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Imagen dentro del hero ocultada, ya no se necesita */
+        .hero-image {
+            display: none;
+        }
+
+        /* ===== SECCIONES ===== */
+        .section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        /* ===== COLECCIÓN ===== */
+        .shop-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .shop-item {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 280px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .shop-item:hover {
+            transform: translateY(-8px);
+        }
+
+        .shop-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .shop-item h3 {
+            margin: 15px 0 10px;
+            color: #2c3e50;
+        }
+
+        .shop-item p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        /* ===== AUTORES ===== */
+        .autores-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .autor-item {
+            background: #fff;
+            border-radius: 10px;
+            padding: 30px 20px;
+            width: 250px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .autor-item i {
+            font-size: 2.5rem;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        /* ===== CENTRO DE AYUDA ===== */
+        .contact-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .contact-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 30px 20px;
+            width: 250px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .contact-card i {
+            font-size: 2.5rem;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #2c3e50;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== MEDIA QUERIES MEJORADAS ===== */
+
+        /* Tablets y pantallas medianas */
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 15px 30px;
+            }
+
+            .hero-text {
+                max-width: 60%;
+            }
+
+            .hero-text .title {
+                font-size: 2.5em;
+            }
+        }
+
+        /* Tablets pequeñas y móviles grandes */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .hero {
+                flex-direction: column;
+                padding: 30px 20px;
+                text-align: center;
+            }
+
+            .hero-text {
+                max-width: 100%;
+            }
+
+            .hero-text .title {
+                font-size: 2em;
+            }
+
+            .section {
+                padding: 60px 20px;
+            }
+        }
+
+        /* Móviles */
+        @media (max-width: 576px) {
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .hero-text .title {
+                font-size: 1.8em;
+            }
+
+            .hero-text .description {
+                font-size: 1em;
+            }
+
+            .shop-item, .autor-item, .contact-card {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .section-title {
+                font-size: 1.7rem;
+            }
+        }
+
+        /* Pantallas muy pequeñas */
+        @media (max-width: 400px) {
+            .hero {
+                padding: 20px 15px;
+            }
+
+            .hero-text .title {
+                font-size: 1.5em;
+            }
+
+            .btn, .btn-login {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Soporte para navegadores antiguos */
+        @supports not (backdrop-filter: blur(6px)) {
+            .navbar.scrolled {
+                background: rgba(255, 255, 255, 0.98);
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- 🔹 NAV Sticky Moderno -->
-<section class="et-hero-tabs">
+<!-- 🔹 NAVBAR PRINCIPAL -->
+<header class="navbar">
     <div class="logo">
-        <h1>BookLab <span>Biblioteca</span></h1>
+        <h1>Lectio <span>Biblioteca</span></h1>
     </div>
-    <div class="et-hero-tabs-container">
-        <a class="et-hero-tab" href="#inicio">Inicio</a>
-        <a class="et-hero-tab" href="#coleccion">Colección</a>
-        <a class="et-hero-tab" href="#autores">Autores</a>
-        <a class="et-hero-tab" href="#centro-ayuda">Ayuda</a>
-        <a class="et-hero-tab" href="/api/librosVirtuales">Libros Virtuales</a>
-        <a class="et-hero-tab login-btn" href="/api/login">Iniciar Sesión</a>
-        <span class="et-hero-tab-slider"></span>
-    </div>
-</section>
+    <nav class="nav-links">
+        <a href="#inicio" class="active">Inicio</a>
+        <a href="#coleccion">Colección</a>
+        <a href="#autores">Autores</a>
+        <a href="#centro-ayuda">Ayuda</a>
+        <a href="/api/librosVirtuales">Libros Virtuales</a>
+        <a href="/api/login" class="btn-login">Iniciar Sesión</a>
+    </nav>
+</header>
 
-<!-- 🔹 Secciones principales -->
+<!-- 🔹 HERO SECTION -->
 <section class="hero" id="inicio">
+    <!-- Video de fondo con atributos de accesibilidad -->
+    <video src="/img/Video3.mp4" autoplay muted loop playsinline aria-label="Video de fondo con libros animados">
+        <!-- Fallback para navegadores que no soportan video -->
+        <p>Tu navegador no soporta el elemento video. Aquí hay un <a href="/img/Video3.mp4">enlace al video</a>.</p>
+    </video>
+
     <div class="hero-text">
-        <p class="collection">Bienvenido</p>
+        <p class="collection" style="color: #ffffff;">Bienvenido</p>
         <h1 class="title">Explora Nuestra Colección Virtual</h1>
-        <p class="description">Accede a miles de libros y recursos de tus autores favoritos desde la comodidad de tu hogar.</p>
+        <p class="description" style="color: #ffffff;">
+            Accede a miles de libros y recursos de tus autores favoritos desde la comodidad de tu hogar.
+        </p>
         <a href="#coleccion" class="btn">Explorar Colección</a>
     </div>
-    <div class="hero-image">
-        <img src="/img/portada.webp" alt="Biblioteca Virtual">
-    </div>
 </section>
 
-<section class="section coleccion" id="coleccion">
+<!-- 🔹 COLECCIÓN -->
+<section class="section" id="coleccion">
     <h2 class="section-title">Nuestra Colección</h2>
     <p class="section-subtitle">Encuentra los mejores libros seleccionados especialmente para ti.</p>
     <div class="shop-container">
         <div class="shop-item">
-            <img src="/img/libro1.jpeg" alt="Libro 1">
+            <img src="/img/libro1.jpeg" alt="Portada del libro Cuentos de hadas clásicos">
             <h3>Cuentos de hadas clásicos</h3>
             <p>Una exploración profunda de los temas más importantes.</p>
             <a href="https://www.gutenberg.org/cache/epub/11036/pg11036-images.html" class="btn">Leer</a>
         </div>
         <div class="shop-item">
-            <img src="/img/libro2.jpeg" alt="Libro 2">
+            <img src="/img/libro2.jpeg" alt="Portada del libro Cuentos de los Hermanos Grimm">
             <h3>Cuentos de los Hermanos Grimm</h3>
             <p>Una guía fascinante sobre los secretos del cosmos.</p>
             <a href="https://www.gutenberg.org/cache/epub/2591/pg2591-images.html" class="btn">Leer</a>
         </div>
         <div class="shop-item">
-            <img src="/img/libro3.jpeg" alt="Libro 3">
+            <img src="/img/libro3.jpeg" alt="Portada del libro Cuentos de Edgar Allan Poe">
             <h3>Cuentos de Edgar Allan Poe</h3>
             <p>Relatos impresionantes sobre las primeras sociedades humanas.</p>
             <a href="https://www.gutenberg.org/cache/epub/1064/pg1064-images.html" class="btn">Leer</a>
@@ -64,119 +438,103 @@
     </div>
 </section>
 
+<!-- 🔹 AUTORES -->
 <section class="section autores" id="autores">
     <h2 class="section-title">Nuestros Autores</h2>
     <div class="autores-container">
         <div class="autor-item">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" aria-hidden="true"></i>
             <h3>Gabriel García Márquez</h3>
             <p>Autor de "Cien Años de Soledad".</p>
         </div>
         <div class="autor-item">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" aria-hidden="true"></i>
             <h3>Isabel Allende</h3>
             <p>Autora de "La Casa de los Espíritus".</p>
         </div>
         <div class="autor-item">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" aria-hidden="true"></i>
             <h3>Jorge Luis Borges</h3>
             <p>Autor de "Ficciones".</p>
         </div>
     </div>
 </section>
 
+<!-- 🔹 CENTRO DE AYUDA -->
 <section class="section centro-ayuda" id="centro-ayuda">
     <h2 class="section-title">Centro de Ayuda</h2>
     <p class="section-subtitle">¿Tienes dudas o necesitas asistencia? ¡Estamos para ayudarte!</p>
     <div class="contact-container">
         <div class="contact-card">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-envelope" aria-hidden="true"></i>
             <h3>Escríbenos</h3>
             <p>servicios@bibliote.gov.co</p>
         </div>
         <div class="contact-card">
-            <i class="fas fa-phone-alt"></i>
-            <h3>Llámamos</h3>
+            <i class="fas fa-phone-alt" aria-hidden="true"></i>
+            <h3>Llámanos</h3>
             <p>(+57 601) 3424100</p>
         </div>
         <div class="contact-card">
-            <i class="fas fa-map-marker-alt"></i>
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
             <h3>Visítanos</h3>
             <p>Calle 24 No. 5 - 60, Bogotá</p>
         </div>
     </div>
 </section>
 
+<!-- 🔹 FOOTER -->
 <footer>
-    <p>&copy; 2024 NexGet Biblioteca. Todos los derechos reservados.</p>
+    <p>&copy; 2025 BookLab. Todos los derechos reservados.</p>
 </footer>
 
-<!-- 🔹 Script Sticky Navigation -->
+<!-- Bootstrap 5 JS (opcional, para componentes interactivos) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    class StickyNavigation {
-        constructor() {
-            this.currentId = null;
-            this.currentTab = null;
-            this.tabContainerHeight = 70;
-            $(window).scroll(() => this.onScroll());
-            $(window).resize(() => this.onResize());
-            $('.et-hero-tab').click((event) => this.onTabClick(event));
-        }
+    // 🔹 Navbar efecto activo al hacer scroll
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".nav-links a");
 
-        onTabClick(event) {
-            event.preventDefault();
-            const target = $(event.target).attr('href');
-            const scrollTop = $(target).offset().top - this.tabContainerHeight + 1;
-            $('html, body').animate({ scrollTop }, 600);
-        }
+    window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 100) current = section.getAttribute("id");
+        });
+        navLinks.forEach((a) => {
+            a.classList.remove("active");
+            if (a.getAttribute("href").includes(current)) a.classList.add("active");
+        });
 
-        onScroll() {
-            this.checkTabContainerPosition();
-            this.findCurrentTabSelector();
+        // Efecto de navbar al hacer scroll
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
         }
+    });
 
-        onResize() {
-            if (this.currentId) this.setSliderCss();
-        }
+    // Optimización para móviles: pausar video cuando no es visible
+    const video = document.querySelector('video');
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.5
+    };
 
-        checkTabContainerPosition() {
-            const offset = $('.et-hero-tabs').offset().top + $('.et-hero-tabs').height() - this.tabContainerHeight;
-            if ($(window).scrollTop() > offset)
-                $('.et-hero-tabs-container').addClass('et-hero-tabs-container--top');
-            else
-                $('.et-hero-tabs-container').removeClass('et-hero-tabs-container--top');
-        }
-
-        findCurrentTabSelector() {
-            let newCurrentId = null;
-            let newCurrentTab = null;
-            $('.et-hero-tab').each((index, element) => {
-                const id = $(element).attr('href');
-                const offsetTop = $(id).offset().top - this.tabContainerHeight;
-                const offsetBottom = $(id).offset().top + $(id).height() - this.tabContainerHeight;
-                if ($(window).scrollTop() > offsetTop && $(window).scrollTop() < offsetBottom) {
-                    newCurrentId = id;
-                    newCurrentTab = $(element);
-                }
-            });
-            if (this.currentId !== newCurrentId) {
-                this.currentId = newCurrentId;
-                this.currentTab = newCurrentTab;
-                this.setSliderCss();
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                video.play();
+            } else {
+                video.pause();
             }
-        }
+        });
+    }, observerOptions);
 
-        setSliderCss() {
-            const width = this.currentTab ? this.currentTab.css('width') : 0;
-            const left = this.currentTab ? this.currentTab.offset().left : 0;
-            $('.et-hero-tab-slider').css({ width, left });
-        }
-    }
-
-    $(document).ready(() => new StickyNavigation());
+    observer.observe(video);
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </body>
 </html>
-

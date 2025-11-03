@@ -1,4 +1,4 @@
-package com.bibli.bia.config;
+/*package com.bibli.bia.config;
 
 import com.bibli.bia.Model.Usuario;
 import com.bibli.bia.repository.UsuarioRepository;
@@ -20,15 +20,24 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Verificamos si el usuario admin3 ya existe
-        if (usuarioRepository.findByUsername("admin5").isEmpty()) {
+        // Contar cuántos admins existen
+        long cantidadAdmins = usuarioRepository.count();
+
+        // Generar un username único
+        String nuevoUsername = "david" + (cantidadAdmins + 1);
+
+        // Verificar que no exista ya un usuario con ese username
+        if (usuarioRepository.findByUsername(nuevoUsername).isEmpty()) {
             Usuario admin = new Usuario();
-            admin.setUsername("admin5"); // Nombre de usuario
-            admin.setPassword(passwordEncoder.encode("1234567")); // Contraseña segura
-            // Asignamos el rol con el prefijo ROLE_
-            admin.setRoles(Set.of("ADMIN")); // Rol de admin con el prefijo ROLE_
+            admin.setUsername(nuevoUsername);
+            admin.setPassword(passwordEncoder.encode("1234567")); // Contraseña por defecto
+            admin.setRoles(Set.of("ADMIN"));
             usuarioRepository.save(admin);
-            System.out.println("Usuario admin4 creado con éxito");
+
+            System.out.println("✅ Se creó automáticamente el usuario: " + nuevoUsername);
+        } else {
+            System.out.println("⚠️ El usuario " + nuevoUsername + " ya existe, no se crea duplicado.");
         }
     }
 }
+*/

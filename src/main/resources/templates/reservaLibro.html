@@ -3,22 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <title>Reserva de Libros - BookLab Biblioteca</title>
-    <link rel="stylesheet" href="/estilos/reserva.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        #mensaje-reserva {
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+        body { background-color:#f5f7fa; color:#2c3e50; }
+
+        header {
+            background-color:#fff;
+            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        nav {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:1rem 5%;
+            max-width:1400px;
+            margin:0 auto;
+        }
+        .logo h1 { font-size:2rem; color:#2c3e50; }
+        .logo span { color:#27ae60; }
+        .nav-links { display:flex; list-style:none; }
+        .nav-links li { margin-left:2rem; }
+        .nav-links a {
+            text-decoration:none;
+            color:#2c3e50;
+            font-weight:500;
+            padding:8px 15px;
+            border-radius:25px;
+            transition:all 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active { background-color:#27ae60; color:#fff; }
+
+        /* Menú hamburguesa para móviles */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #2c3e50;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .nav-overlay {
             display: none;
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #4CAF50;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        .nav-overlay.active {
+            display: block;
+        }
+
+        main.reserva-section {
+            padding:2rem 5%;
+            max-width:1200px;
+            margin:0 auto;
+        }
+
+        /* Filtros y buscador */
+        .filtros-buscador {
+            display:flex;
+            flex-wrap:wrap;
+            gap:1rem;
+            margin-bottom:2rem;
+        }
+        .filtros-buscador select,
+        .filtros-buscador input {
+            padding:0.8rem 1rem;
+            border:1px solid #ddd;
+            border-radius:8px;
+            font-size:1rem;
+            flex:1;
+            transition:border-color 0.3s;
+        }
+        .filtros-buscador select:focus,
+        .filtros-buscador input:focus { border-color:#27ae60; outline:none; }
+
+        /* Lista de libros */
+        .lista-libros {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+            gap:1rem;
+        }
+        .libro-item {
+            background:#fff;
+            padding:1rem;
+            border-radius:12px;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+            transition:transform 0.3s;
+        }
+        .libro-item:hover { transform:translateY(-5px); }
+        .libro-item h3 { font-size:1.1rem; margin-bottom:0.5rem; }
+        .libro-item p { font-size:0.9rem; margin-bottom:0.3rem; color:#7f8c8d; }
+
+        .btn-seleccionar {
+            width:100%;
+            padding:0.5rem;
+            border-radius:30px;
+            background:#27ae60;
+            color:#fff;
+            border:none;
+            cursor:pointer;
+            transition:0.3s;
+        }
+        .btn-seleccionar:hover { background:#219150; }
+
+        /* Formulario flotante */
+        #formulario-reserva {
+            display:none;
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%, -50%);
+            width:90%;
+            max-width:400px;
+            background:#fff;
+            padding:1.5rem;
+            border-radius:12px;
+            box-shadow:0 8px 20px rgba(0,0,0,0.2);
+            z-index:999;
+        }
+        #formulario-reserva h2 { text-align:center; margin-bottom:1rem; }
+        .form-grupo { margin-bottom:1rem; }
+        .form-grupo label { display:block; margin-bottom:0.3rem; font-weight:500; }
+        .form-grupo input { width:100%; padding:0.7rem 1rem; border:1px solid #ddd; border-radius:8px; }
+        .form-grupo input:focus { border-color:#27ae60; outline:none; }
+        .btn-confirmar { width:100%; padding:0.7rem; border-radius:30px; background:#27ae60; color:#fff; border:none; cursor:pointer; margin-top:0.5rem; }
+        .btn-confirmar:hover { background:#219150; }
+        #cancelar-reserva { width:100%; padding:0.7rem; border-radius:30px; background:#e74c3c; color:#fff; border:none; cursor:pointer; margin-top:0.5rem; }
+        #cancelar-reserva:hover { background:#c0392b; }
+
+        /* Mensaje flotante */
+        #mensaje-reserva {
+            display:none;
+            position:fixed;
+            top:20px;
+            right:20px;
+            background-color:#4CAF50;
+            color:white;
+            padding:15px 25px;
+            border-radius:8px;
+            box-shadow:0 0 10px rgba(0,0,0,0.3);
+            z-index:1000;
+        }
+
+        /* Paginación */
+        .pagination {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:10px;
+            margin:30px 0;
+            flex-wrap:wrap;
+        }
+
+        .pagination button {
+            padding:8px 15px;
+            border:none;
+            border-radius:50px;
+            background:#27ae60;
+            color:#fff;
+            font-weight:600;
+            cursor:pointer;
+            transition:all 0.3s;
+        }
+
+        .pagination button:hover {
+            background:#219150;
+            transform:translateY(-2px);
+        }
+
+        .pagination button.disabled {
+            background:#bdc3c7;
+            cursor:not-allowed;
+        }
+
+        /* Buscador de páginas */
+        .page-jumper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .page-jumper input {
+            width: 60px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            text-align: center;
+        }
+
+        .page-jumper input:focus {
+            outline: none;
+            border-color: #27ae60;
+        }
+
+        .page-jumper button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 50px;
+            background: #2c3e50;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-jumper button:hover {
+            background: #1a252f;
+            transform: translateY(-2px);
+        }
+
+        /* Modal de error */
+        .page-error-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .page-error-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .page-error-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .page-error-modal.active .page-error-content {
+            transform: scale(1);
+        }
+
+        .page-error-icon {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .page-error-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .page-error-message {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .page-error-close {
+            padding: 10px 25px;
+            background: #27ae60;
             color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            z-index: 9999;
-            font-family: 'Poppins', sans-serif;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-error-close:hover {
+            background: #219150;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background:#2c3e50;
+            color:#fff;
+            text-align:center;
+            padding:1.5rem;
+            margin-top:2rem;
+            font-size:0.9rem;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+
+        /* Tablet (768px - 1024px) */
+        @media (max-width: 1024px) {
+            nav {
+                padding: 1rem 3%;
+            }
+
+            .logo h1 {
+                font-size: 1.7rem;
+            }
+
+            main.reserva-section {
+                padding: 1.5rem 3%;
+            }
+
+            .lista-libros {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 0.8rem;
+            }
+        }
+
+        /* Móviles (hasta 768px) */
+        @media (max-width: 768px) {
+            /* Header y navegación móvil */
+            header {
+                padding: 0;
+            }
+
+            nav {
+                padding: 15px;
+                position: relative;
+                flex-wrap: nowrap;
+            }
+
+            .menu-toggle {
+                display: block;
+                order: 2;
+            }
+
+            .logo {
+                order: 1;
+                flex: 1;
+            }
+
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: #fff;
+                flex-direction: column;
+                justify-content: flex-start;
+                padding-top: 80px;
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+                z-index: 999;
+                gap: 0;
+                margin: 0;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                text-align: center;
+                margin: 0;
+            }
+
+            .nav-links li a {
+                display: block;
+                width: 100%;
+                padding: 15px;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            /* Búsqueda y filtros móviles */
+            .filtros-buscador {
+                flex-direction:column;
+            }
+
+            .filtros-buscador select,
+            .filtros-buscador input {
+                width: 100%;
+            }
+
+            /* Lista de libros móvil */
+            .lista-libros {
+                grid-template-columns:1fr;
+            }
+
+            .libro-item {
+                padding: 0.8rem;
+            }
+
+            .libro-item h3 {
+                font-size: 1rem;
+            }
+
+            .libro-item p {
+                font-size: 0.85rem;
+            }
+
+            /* Paginación móvil */
+            .pagination {
+                gap: 5px;
+                margin: 20px 0;
+            }
+
+            .pagination button {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+
+            .page-jumper {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .page-jumper input {
+                width: 80px;
+            }
+        }
+
+        /* Móviles pequeños (hasta 480px) */
+        @media (max-width: 480px) {
+            nav {
+                padding: 10px;
+            }
+
+            .logo h1 {
+                font-size: 1.3rem;
+            }
+
+            main.reserva-section {
+                padding: 1rem 10px;
+            }
+
+            .libro-item {
+                padding: 0.7rem;
+            }
+
+            .btn-seleccionar {
+                padding: 0.4rem;
+                font-size: 0.9rem;
+            }
+
+            #formulario-reserva {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            .form-grupo input {
+                padding: 0.6rem 0.8rem;
+            }
         }
     </style>
 </head>
@@ -26,231 +480,364 @@
 
 <header>
     <nav>
-        <div class="logo">
-            <h1>BookLab <span>Biblioteca</span></h1>
-        </div>
-        <div class="nav-right">
-            <ul class="nav-links">
-                <li><a href="/api/logiado">Inicio</a></li>
-                <li><a href="/api/libroVirtualesLog">Libros virtuales</a></li>
-                <li><a href="/api/reservaLibro">Reserva de libros</a></li>
-            </ul>
-        </div>
+        <div class="logo"><h1>Lectio <span>Biblioteca</span></h1></div>
+
+        <!-- Menú hamburguesa para móviles -->
+        <button class="menu-toggle" aria-label="Abrir menú de navegación">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="nav-overlay"></div>
+
+        <ul class="nav-links">
+            <li><a href="/api/logiado">Inicio</a></li>
+            <li><a href="/api/libroVirtualesLog">Libros virtuales</a></li>
+            <li><a href="/api/reservaLibro" class="active">Reserva de libros</a></li>
+        </ul>
     </nav>
 </header>
 
 <main class="reserva-section">
-    <div class="reserva-container">
-        <h2 class="section-title">Reserva tu Libro Favorito</h2>
+    <div class="filtros-buscador">
+        <select id="categoria" name="categoria">
+            <option value="" disabled selected>Selecciona una categoría</option>
+            <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
+        </select>
+        <input type="text" id="busqueda" placeholder="Buscar libro por título o autor">
+    </div>
 
+    <div class="lista-libros" id="lista-libros"></div>
 
-        <div class="filtros-container">
-            <div class="filtro-grupo">
-                <label for="categoria">Categoría:</label>
-                <select id="categoria" required>
-                    <option value="" disabled selected>Selecciona una categoría</option>
-                    <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}"></option>
-                </select>
-            </div>
+    <!-- Paginación -->
+    <div class="pagination" id="pagination"></div>
 
-            <div class="filtro-grupo" id="grupo-busqueda" style="display:none;">
-                <label for="busqueda">Buscar libro:</label>
-                <input type="text" id="busqueda" placeholder="Título, autor...">
-            </div>
-        </div>
-
-        <!-- Resultados -->
-        <div class="resultados-container" id="resultados-container" style="display:none;">
-            <div class="contador-libros">
-                <span id="contador">0 libros encontrados</span>
-            </div>
-
-            <div class="lista-libros" id="lista-libros">
-                <!-- Los libros se cargarán aquí dinámicamente -->
-            </div>
-        </div>
-
-        <!-- Formulario de reserva -->
-        <div class="formulario-reserva" id="formulario-reserva" style="display:none;">
-            <h3>Completar Reserva</h3>
-            <form id="reserva-form">
-                <input type="hidden" id="libro-seleccionado" name="libro">
-                <input type="hidden" id="categoria-seleccionada" name="categoria">
-
-                <div class="form-grupo">
-                    <label for="idUsuario">ID de Usuario:</label>
-                    <input type="text" id="idUsuario" name="idUsuario" required>
-                </div>
-
-                <div class="form-grupo">
-                    <label for="nombreCompleto">Nombre Completo:</label>
-                    <input type="text" id="nombreCompleto" name="nombreCompleto" required>
-                </div>
-
-                <div class="form-grupo">
-                    <label for="correo">Correo Electrónico:</label>
-                    <input type="email" id="correo" name="correo" required>
-                </div>
-
-                <div class="form-grupo">
-                    <label for="fecha">Fecha de Reserva:</label>
-                    <input type="date" id="fecha" name="fecha" required>
-                </div>
-
-                <div class="form-acciones">
-                    <button type="button" id="cancelar-reserva" class="btn btn-secundario">Cancelar</button>
-                    <button type="submit" class="btn btn-primario">Confirmar Reserva</button>
-                </div>
-            </form>
-        </div>
+    <!-- Buscador de páginas -->
+    <div class="page-jumper" id="pageJumper">
+        <span>Ir a la página:</span>
+        <input type="number" id="pageInput" min="1" value="1">
+        <button id="goToPageBtn">Ir</button>
     </div>
 </main>
+
+<!-- Formulario flotante -->
+<div id="formulario-reserva">
+    <h2>Reservar Libro</h2>
+    <form id="reserva-form" method="post">
+        <input type="hidden" id="libro-seleccionado" name="libro">
+        <input type="hidden" id="categoria-seleccionada" name="categoria">
+
+        <div class="form-grupo">
+            <label for="idUsuario">ID Usuario</label>
+            <input type="text" id="idUsuario" name="idUsuario" placeholder="ID de Usuario" required>
+        </div>
+        <div class="form-grupo">
+            <label for="nombreCompleto">Nombre Completo</label>
+            <input type="text" id="nombreCompleto" name="nombreCompleto" placeholder="Nombre completo" required>
+        </div>
+        <div class="form-grupo">
+            <label for="correo">Correo Electrónico</label>
+            <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required>
+        </div>
+        <div class="form-grupo">
+            <label for="fecha">Fecha de Reserva</label>
+            <input type="date" id="fecha" name="fecha" required>
+        </div>
+        <button type="submit" class="btn-confirmar">Confirmar Reserva</button>
+        <button type="button" id="cancelar-reserva">Cancelar</button>
+    </form>
+</div>
+
+<!-- Modal de error para páginas no existentes -->
+<div class="page-error-modal" id="pageErrorModal">
+    <div class="page-error-content">
+        <div class="page-error-icon">⚠️</div>
+        <h2 class="page-error-title">Página no encontrada</h2>
+        <p class="page-error-message" id="pageErrorMessage">
+            El número de página que ingresaste no existe.
+        </p>
+        <button class="page-error-close" id="pageErrorClose">Entendido</button>
+    </div>
+</div>
+
+<div id="mensaje-reserva"></div>
 
 <footer>
     <p>&copy; 2024 BookLab Biblioteca. Todos los derechos reservados.</p>
 </footer>
 
-
-<div id="mensaje-reserva"></div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function(){
 
-      // Variables para almacenar todos los libros y los que coincidan con la búsqueda
-      let todosLosLibros = [];
-      let librosFiltrados = [];
+        let todosLosLibros = [];
+        const itemsPerPage = 8; // Menos elementos por página para mejor visualización en móviles
+        let currentPage = 1;
+        let filteredBooks = [];
+        let totalPages = 0;
+        const hoy = new Date().toISOString().split('T')[0];
+        $('#fecha').attr('min', hoy);
 
-      // Cuando el usuario cambia la categoría seleccionada
-      $('#categoria').change(function() {
-        const categoria = $(this).val(); // Obtiene la categoría seleccionada
+        // ===== FUNCIÓN PARA MENÚ MÓVIL =====
+        const menuToggle = $('.menu-toggle');
+        const navLinks = $('.nav-links');
+        const navOverlay = $('.nav-overlay');
 
-        if (categoria) {
-          cargarLibros(categoria);       // Carga los libros de esa categoría
-          $('#grupo-busqueda').show();   // Muestra el campo de búsqueda
-        } else {
-          $('#resultados-container').hide(); // Oculta resultados si no se eligió nada
-          $('#grupo-busqueda').hide();       // Oculta también el campo de búsqueda
-        }
-      });
+        if (menuToggle.length && navLinks.length && navOverlay.length) {
+            menuToggle.on('click', function() {
+                navLinks.toggleClass('active');
+                navOverlay.toggleClass('active');
+                $('body').css('overflow', navLinks.hasClass('active') ? 'hidden' : '');
 
-      // Cada vez que el usuario escribe en el campo de búsqueda
-      $('#busqueda').keyup(function() {
-        filtrarLibros(); // Filtra los libros en tiempo real
-      });
+                // Cambiar icono del menú
+                const icon = $(this).find('i');
+                if (navLinks.hasClass('active')) {
+                    icon.removeClass('fa-bars').addClass('fa-times');
+                } else {
+                    icon.removeClass('fa-times').addClass('fa-bars');
+                }
+            });
 
-      // Al hacer clic en el botón "Cancelar reserva", se oculta el formulario
-      $('#cancelar-reserva').click(function() {
-        $('#formulario-reserva').hide();
-      });
+            // Cerrar menú al hacer clic en el overlay
+            navOverlay.on('click', function() {
+                navLinks.removeClass('active');
+                $(this).removeClass('active');
+                $('body').css('overflow', '');
 
-      // Al enviar el formulario de reserva
-      $('#reserva-form').submit(function(e) {
-        e.preventDefault();  // Evita que el formulario se envíe de forma tradicional
-        enviarReserva();     // Envía los datos por AJAX
-      });
+                // Restaurar icono del menú
+                const icon = menuToggle.find('i');
+                icon.removeClass('fa-times').addClass('fa-bars');
+            });
 
-      // Función que carga los libros desde el backend usando AJAX
-      function cargarLibros(categoria) {
-        $.ajax({
-          url: '/api/cargarLibrosPorCategoria',
-          type: 'GET',
-          data: { categoria: categoria },
-          beforeSend: function() {
-            $('#lista-libros').html('<div class="cargando">Cargando libros...</div>'); // Muestra mensaje de carga
-          },
-          success: function(data) {
-            todosLosLibros = data;      // Guarda todos los libros
-            librosFiltrados = data;     // Inicialmente, los filtrados son todos
-            mostrarLibros(data);        // Muestra los libros en pantalla
-            $('#categoria-seleccionada').val(categoria); // Guarda la categoría en un campo oculto
-            $('#resultados-container').show();           // Muestra el contenedor de resultados
-          },
-          error: function() {
-            mostrarMensajeReserva('Error al cargar los libros', true); // Muestra error si falla la petición
-          }
-        });
-      }
+            // Cerrar menú al hacer clic en un enlace (en móviles)
+            $('.nav-links a').on('click', function() {
+                if (window.innerWidth <= 768) {
+                    navLinks.removeClass('active');
+                    navOverlay.removeClass('active');
+                    $('body').css('overflow', '');
 
-      // Función que filtra los libros según el texto ingresado por el usuario
-      function filtrarLibros() {
-        const busqueda = $('#busqueda').val().toLowerCase();
-
-        if (busqueda === '') {
-          librosFiltrados = todosLosLibros;
-        } else {
-          librosFiltrados = todosLosLibros.filter(function(libro) {
-            return libro.titulo.toLowerCase().includes(busqueda) ||
-                   (libro.autor && libro.autor.toLowerCase().includes(busqueda));
-          });
+                    // Restaurar icono del menú
+                    const icon = menuToggle.find('i');
+                    icon.removeClass('fa-times').addClass('fa-bars');
+                }
+            });
         }
 
-        mostrarLibros(librosFiltrados); // Muestra los libros filtrados
-      }
+        // Cargar libros por categoría
+        $('#categoria').change(function(){
+            const categoria = $(this).val();
+            $('#categoria-seleccionada').val(categoria);
+            if(categoria){
+                $.ajax({
+                    url:'/api/cargarLibrosPorCategoria',
+                    type:'GET',
+                    data:{categoria:categoria},
+                    success:function(data){
+                        todosLosLibros = data;
+                        filteredBooks = data;
+                        currentPage = 1;
+                        mostrarLibrosPaginados();
+                        renderPagination();
+                    },
+                    error:function(){
+                        mostrarMensaje('Error al cargar los libros', 'error');
+                    }
+                });
+            } else {
+                $('#lista-libros').empty();
+                $('#pagination').empty();
+                $('#pageJumper').hide();
+            }
+        });
 
-      // Función que muestra los libros en pantalla
-      function mostrarLibros(libros) {
-        const $lista = $('#lista-libros');
-        $lista.empty(); // Limpia el contenedor
+        // Filtrar libros
+        $('#busqueda').keyup(function(){
+            const term = $(this).val().toLowerCase();
+            filteredBooks = todosLosLibros.filter(libro =>
+                libro.titulo.toLowerCase().includes(term) ||
+                (libro.autor && libro.autor.toLowerCase().includes(term))
+            );
+            currentPage = 1;
+            mostrarLibrosPaginados();
+            renderPagination();
+        });
 
-        if (libros.length === 0) {
-          $lista.html('<div class="sin-resultados">No se encontraron libros</div>');
-          $('#contador').text('0 libros encontrados');
-          return;
+        function mostrarLibrosPaginados() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const librosPagina = filteredBooks.slice(startIndex, endIndex);
+
+            const $lista = $('#lista-libros');
+            $lista.empty();
+
+            if (filteredBooks.length === 0) {
+                $lista.html('<p>No se encontraron libros</p>');
+                return;
+            }
+
+            librosPagina.forEach(libro => {
+                $lista.append(`
+                    <div class="libro-item" data-titulo="${libro.titulo}">
+                        <h3>${libro.titulo}</h3>
+                        ${libro.autor ? `<p><strong>Autor:</strong> ${libro.autor}</p>` : ''}
+                        ${libro.anioPublicacion ? `<p><strong>Año:</strong> ${libro.anioPublicacion}</p>` : ''}
+                        <button type="button" class="btn-seleccionar">Seleccionar</button>
+                    </div>
+                `);
+            });
+
+            $('.btn-seleccionar').off('click').on('click', function(){
+                const titulo = $(this).closest('.libro-item').data('titulo');
+                $('#libro-seleccionado').val(titulo);
+                $('#formulario-reserva').fadeIn();
+            });
         }
 
-        $('#contador').text(libros.length + ' libros encontrados');
+        function renderPagination() {
+            const $pagination = $('#pagination');
+            $pagination.empty();
 
-        // Recorre la lista de libros y crea una "tarjeta" por cada uno
-        libros.forEach(function(libro) {
-          $lista.append(`
-            <div class="libro-item" data-titulo="${libro.titulo}">
-              <h3>${libro.titulo}</h3>
-              ${libro.autor ? `<p><strong>Autor:</strong> ${libro.autor}</p>` : ''}
-              ${libro.anioPublicacion ? `<p><strong>Año:</strong> ${libro.anioPublicacion}</p>` : ''}
-              <button class="btn-seleccionar">Seleccionar</button>
-            </div>
-          `);
+            totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
+
+            if (totalPages <= 1) {
+                $('#pageJumper').hide();
+                return;
+            }
+
+            $('#pageJumper').show();
+
+            // Botón anterior
+            const prevBtn = $('<button>').text('←');
+            if (currentPage === 1) {
+                prevBtn.addClass('disabled').prop('disabled', true);
+            }
+            prevBtn.on('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    mostrarLibrosPaginados();
+                    renderPagination();
+                }
+            });
+            $pagination.append(prevBtn);
+
+            // Solo mostrar 3 números de página
+            let startPage = Math.max(1, currentPage - 1);
+            let endPage = Math.min(totalPages, startPage + 2);
+
+            // Ajustar si estamos cerca del final
+            if (endPage - startPage < 2) {
+                startPage = Math.max(1, endPage - 2);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = $('<button>').text(i);
+                if (i === currentPage) {
+                    btn.addClass('disabled');
+                }
+                btn.on('click', function() {
+                    currentPage = i;
+                    mostrarLibrosPaginados();
+                    renderPagination();
+                });
+                $pagination.append(btn);
+            }
+
+            // Botón siguiente
+            const nextBtn = $('<button>').text('→');
+            if (currentPage === totalPages) {
+                nextBtn.addClass('disabled').prop('disabled', true);
+            }
+            nextBtn.on('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    mostrarLibrosPaginados();
+                    renderPagination();
+                }
+            });
+            $pagination.append(nextBtn);
+        }
+
+        // Función para ir a página específica
+        $('#goToPageBtn').on('click', goToPage);
+        $('#pageInput').on('keyup', function(e) {
+            if (e.key === 'Enter') goToPage();
         });
 
-        // Asigna la función al botón de "Seleccionar"
-        $('.btn-seleccionar').click(function() {
-          const titulo = $(this).closest('.libro-item').data('titulo');
-          $('#libro-seleccionado').val(titulo);  // Llena el campo oculto con el título
-          $('#formulario-reserva').show();       // Muestra el formulario
-          // Desplaza la página hacia el formulario
-          $('html, body').animate({
-            scrollTop: $('#formulario-reserva').offset().top
-          }, 500);
+        function goToPage() {
+            const pageNum = parseInt($('#pageInput').val());
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                currentPage = pageNum;
+                mostrarLibrosPaginados();
+                renderPagination();
+            } else {
+                showPageError(pageNum);
+            }
+        }
+
+        function showPageError(requestedPage) {
+            // Actualizar el mensaje con el número total de páginas disponibles
+            $('#pageErrorMessage').text(`Solo tenemos ${totalPages} página${totalPages !== 1 ? 's' : ''} disponible${totalPages !== 1 ? 's' : ''}. Por favor, ingresa un número entre 1 y ${totalPages}.`);
+
+            // Mostrar el modal
+            $('#pageErrorModal').addClass('active');
+
+            // Actualizar el valor del input con la página actual
+            $('#pageInput').val(currentPage);
+        }
+
+        // Cerrar el modal de error
+        $('#pageErrorClose').on('click', function() {
+            $('#pageErrorModal').removeClass('active');
         });
-      }
 
-      // Envía el formulario de reserva al backend usando AJAX
-      function enviarReserva() {
-        const formData = $('#reserva-form').serialize(); // Serializa los datos del formulario
-
-        $.ajax({
-          url: '/api/guardarReservaUsuario',
-          type: 'POST',
-          data: formData,
-          success: function(response) {
-            $('#reserva-form')[0].reset();      // Limpia el formulario
-            $('#formulario-reserva').hide();    // Oculta el formulario
-            mostrarMensajeReserva('Reserva realizada con éxito'); // Muestra mensaje de éxito
-          },
-          error: function() {
-            mostrarMensajeReserva('Error al realizar la reserva', true); // Muestra error
-          }
+        // Cerrar el modal al hacer clic fuera del contenido
+        $('#pageErrorModal').on('click', function(e) {
+            if (e.target === this) {
+                $(this).removeClass('active');
+            }
         });
-      }
 
-      // Muestra un mensaje en pantalla (éxito o error)
-      function mostrarMensajeReserva(mensaje, esError = false) {
-        const $mensaje = $('#mensaje-reserva');
-        $mensaje.text(mensaje);
-        $mensaje.css('background-color', esError ? '#e74c3c' : '#4CAF50'); // Rojo si es error, verde si es éxito
-        $mensaje.fadeIn(300).delay(3000).fadeOut(500); // Muestra el mensaje por 3 segundos
-      }
+        // Cerrar el modal con la tecla Escape
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $('#pageErrorModal').hasClass('active')) {
+                $('#pageErrorModal').removeClass('active');
+            }
+        });
+
+        $('#cancelar-reserva').click(function(){
+            $('#formulario-reserva').fadeOut();
+            $('#reserva-form')[0].reset();
+        });
+
+        // Guardar reserva con AJAX
+        $('#reserva-form').submit(function(e){
+            e.preventDefault();
+            const datos = $(this).serialize();
+            $.ajax({
+                url:'/api/guardarReservaUsuario',
+                type:'POST',
+                data:datos,
+                success:function(res){
+                    mostrarMensaje('Reserva realizada con éxito', 'exito');
+                    $('#formulario-reserva').fadeOut();
+                    $('#reserva-form')[0].reset();
+                },
+                error:function(xhr){
+                    let msg = 'Error al realizar la reserva';
+                    if(xhr.responseText) msg = xhr.responseText;
+                    mostrarMensaje(msg, 'error');
+                }
+            });
+        });
+
+        function mostrarMensaje(texto, tipo){
+            const $msg = $('#mensaje-reserva');
+            $msg.text(texto);
+            if(tipo === 'exito') $msg.css('background-color', '#4CAF50');
+            else $msg.css('background-color', '#e74c3c');
+            $msg.fadeIn();
+
+            setTimeout(()=>{ $msg.fadeOut(); }, 3000);
+        }
 
     });
 </script>

@@ -1,97 +1,915 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookLab - Administración</title>
-    <link rel="stylesheet" href="/estilos/adminA.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lectio - Panel de Administración (Unificado)</title>
+
+    <!-- Font Awesome + Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ====== Estilos base (tomados y adaptados de tu adminLectio.css) ====== */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+        body { display:flex; min-height:100vh; background:#101827; color:#e5e7eb; }
+
+        /* Sidebar */
+        .sidebar { width:260px; background:#111827; padding:30px 20px; position:fixed; height:100%; border-right:1px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; }
+        .logo { display:flex; align-items:center; gap:10px; color:#3b82f6; font-size:1.5rem; font-weight:600; margin-bottom:40px; }
+        .logo i { font-size:1.6rem; }
+        .menu { list-style:none; flex-grow:1; }
+        .menu li { margin-bottom:15px; }
+        .menu a { display:flex; align-items:center; gap:12px; text-decoration:none; color:#9ca3af; font-weight:500; padding:10px 15px; border-radius:10px; transition:0.2s; cursor:pointer; }
+        .menu a:hover, .menu a.active { background:#1e293b; color:#fff; }
+        .logout { margin-top:auto; }
+        .logout button { width:100%; background:#ef4444; border:none; padding:10px; color:white; border-radius:8px; font-weight:600; cursor:pointer; }
+        .logout button:hover { background:#dc2626; }
+
+        /* Main */
+        .main-content { margin-left:260px; flex:1; padding:36px; background:#0f172a; min-height:100vh; overflow:auto; }
+        .header-title { margin-bottom:18px; }
+        .header-title h2 { font-size:2rem; color:#fff; }
+        .header-title p { color:#94a3b8; margin-top:6px; }
+
+        /* Dashboard cards */
+        .dashboard-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin:18px 0 30px; }
+        .card { background:#1e293b; padding:22px; border-radius:12px; text-align:center; transition:0.18s; }
+        .card i { font-size:1.7rem; color:#3b82f6; }
+        .card h3 { color:#fff; margin-top:12px; font-size:1.15rem; }
+        .card p { color:#9ca3af; margin-top:8px; }
+
+        /* Section wrapper */
+        .section-wrapper { background:#0f172a; padding:12px; border-radius:10px; }
+        .section { background:#071028; padding:18px; border-radius:10px; box-shadow: 0 6px 18px rgba(0,0,0,0.4); color:#e6eef8; }
+
+        /* Simple form styling used by sections */
+        .form-group { margin-bottom:12px; }
+        label { display:block; margin-bottom:6px; color:#cbd5e1; font-weight:500; }
+        input[type="text"], input[type="email"], input[type="date"], input[type="number"], select, textarea {
+          width:100%; padding:10px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8; outline:none;
+        }
+        textarea { min-height:90px; resize:vertical; }
+        .btn { display:inline-block; background:#3b82f6; color:white; padding:10px 18px; border-radius:999px; text-decoration:none; cursor:pointer; border:none; font-weight:600; }
+        .btn.secondary { background:#6b7280; }
+        table { width:100%; border-collapse:collapse; margin-top:10px; color:#e6eef8; }
+        th, td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.03); text-align:left; font-size:0.95rem; color:#cbd5e1; }
+        thead th { background:#0b1a2b; color:#94a3b8; position:sticky; top:0; z-index:2; }
+        .small-muted { color:#94a3b8; font-size:0.9rem; }
+
+        /* Responsive */
+        @media (max-width:900px) {
+          .sidebar { position:fixed; transform:translateX(-100%); transition:transform .25s; z-index:30; }
+          .sidebar.open { transform:translateX(0); }
+          .main-content { margin-left:0; padding:20px; }
+        }
+    </style>
 </head>
 <body>
 
-<header>
-    <nav>
-        <div class="logo">
-            <h1>BookLab - Admin</h1>
-        </div>
-        <div class="user-info">
-            <form action="/api/logout" method="post">
-                <button type="submit" class="btn logout-btn">Cerrar sesión</button>
-            </form>
-        </div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div>
+        <div class="logo"><i class="fas fa-book-open"></i><div> <strong>Lectio</strong></div></div>
 
-    </nav>
-</header>
-
-<section class="section admin-panel" id="admin-panel">
-    <h2 class="section-title">Panel de Administración</h2>
-    <div class="admin-options-container">
-
-        <div class="admin-option">
-            <i class="fas fa-book"></i>
-            <h3>Reservar Libro</h3>
-            <p>Gestiona las reservas de libros para los usuarios.</p>
-            <a href="/api/reservaAdmin" class="btn">Ir a Reservas</a>
-        </div>
-
-        <div class="admin-option">
-            <i class="fas fa-users"></i>
-            <h3>Gestión de Usuarios</h3>
-            <p>Administra la información de los usuarios registrados.</p>
-            <a href="/api/usuariosAdmin" class="btn">Ver Usuarios</a>
-        </div>
-
-        <!-- Nueva opción Dashboard -->
-        <div class="admin-option">
-            <i class="fas fa-tachometer-alt"></i>
-            <h3>Dashboard</h3>
-            <p>Accede a las estadísticas y métricas del sistema.</p>
-            <a href="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9" class="btn" target="_blank">Ver Dashboard</a>
-
-        </div>
-
-        <div class="admin-option">
-            <i class="fas fa-plus"></i>
-            <h3>Añadir Libro</h3>
-            <p>Agrega nuevos libros al sistema de la biblioteca.</p>
-            <a href="/api/addBook" class="btn">Añadir Libro</a>
-        </div>
-        <div class="admin-option">
-            <i class="fas fa-plus"></i>
-            <h3>Añadir Libro Fisicos</h3>
-            <p>Agrega nuevos libros Fisicos al sistema de la biblioteca.</p>
-            <a href="/api/addLibroF" class="btn">Añadir Libro</a>
-        </div>
-
-        <div class="admin-option">
-            <i class="fas fa-undo"></i>
-            <h3>Devolver Libro</h3>
-            <p>Gestiona la devolución de libros por parte de los usuarios.</p>
-            <a href="/api/devolucion" class="btn">Devolver Libro</a>
-        </div>
-
-
-        <div class="admin-option">
-            <i class="fas fa-star"></i>
-            <h3>Ver Reseñas</h3>
-            <p>Revisa las reseñas de los libros por parte de los usuarios.</p>
-            <a href="/api/resenasAdmin" class="btn">Ver Reseñas</a>
-        </div>
-
-        <div class="admin-option">
-            <i class="fas fa-money-bill-wave"></i>
-            <h3>Gestión de Multas</h3>
-            <p>Administra las multas generadas por retrasos en la devolución de libros.</p>
-            <a href="/api/multas" class="btn">Gestionar Multas</a>
-        </div>
-
-
+        <ul class="menu" id="menu">
+            <li><a data-section="dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a data-section="reservas"><i class="fas fa-calendar-check"></i> Reservas</a></li>
+            <li><a data-section="addVirtual"><i class="fas fa-plus"></i> Añadir Libros Virtuales</a></li>
+            <li><a data-section="addFisico"><i class="fas fa-plus-circle"></i> Añadir Libros Físicos</a></li>
+            <li><a data-section="devoluciones"><i class="fas fa-undo"></i> Devoluciones</a></li>
+            <li><a data-section="multas"><i class="fas fa-money-bill-wave"></i> Multas</a></li>
+            <li><a data-section="resenas"><i class="fas fa-star"></i> Reseñas</a></li>
+            <!-- Eliminado: Usuarios -->
+        </ul>
     </div>
-</section>
 
-<footer>
-    <p>&copy; 2024 NexGet Biblioteca. Todos los derechos reservados.</p>
-</footer>
+    <form action="/api/logout" method="post" class="logout">
+        <button type="submit"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+    </form>
+</aside>
 
+<!-- MAIN CONTENT -->
+<main class="main-content">
+    <div class="header-title">
+        <h2>Panel de Administración</h2>
+        <p>Bienvenido al centro de control de Lectio 📚</p>
+    </div>
+
+    <!-- Main area where sections will be injected -->
+    <div id="main-area" class="section-wrapper">
+        <!-- Initial dashboard content -->
+        <section id="dashboard-section" class="section">
+            <div class="dashboard-cards">
+                <div class="card"><i class="fas fa-users"></i><h3>Usuarios</h3><p class="small-muted">1,245 registrados</p></div>
+                <div class="card"><i class="fas fa-book"></i><h3>Libros Virtuales</h3><p class="small-muted">3,456 disponibles</p></div>
+                <div class="card"><i class="fas fa-book-reader"></i><h3>Reservas</h3><p class="small-muted">553 activas</p></div>
+                <div class="card"><i class="fas fa-star"></i><h3>Valoración Promedio</h3><p class="small-muted">4.8 / 5</p></div>
+            </div>
+
+            <div class="dashboard-links section" style="margin-top:16px;">
+                <h3>Dashboard PowerBI</h3>
+                <p class="small-muted">Consulta las métricas y estadísticas del sistema.</p>
+                <a class="btn" target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9">Ver Dashboard</a>
+            </div>
+        </section>
+    </div>
+
+</main>
+
+<!-- jQuery (tu código original usa jQuery) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    /**************************************************************************
+     * Templates for each section (raw HTML strings). When a menu item is
+     * selected we inject the corresponding template into #main-area and call
+     * its initializer function (initReservas, initAddVirtual, ...).
+     *
+     * I preserved your original markup and JS logic — only reorganized them
+     * into init functions so they run safely when the section is inserted.
+     **************************************************************************/
+
+    // ------- RESERVAS (plantilla y init) -------
+    const reservasTemplate = `
+      <section id="reservas-section" class="section">
+        <h3>Gestión de Reservas de Libros</h3>
+
+        <div style="margin-top:12px;" class="section-inner">
+          <div class="form-group">
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" required>
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <!-- Las opciones pueden venir desde el servidor en el render, o cargarlas dinámicamente -->
+              <option>Novelas</option>
+              <option>Ciencia</option>
+              <option>Historia</option>
+              <option>Arte</option>
+              <option>Fantasía</option>
+              <option>Filosofía</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="grupo-busqueda" style="display:none;">
+            <label for="busqueda">Buscar libro:</label>
+            <input type="text" id="busqueda" placeholder="Título, autor...">
+          </div>
+
+          <div id="resultados-container" style="display:none; margin-top:10px;">
+            <div class="small-muted" id="contador">0 libros encontrados</div>
+            <div id="lista-libros" style="margin-top:10px;"></div>
+          </div>
+
+          <div id="formulario-reserva" style="display:none; margin-top:12px;">
+            <h4>Completar Reserva</h4>
+            <div id="mensaje-exito" style="display:none; background:#d4edda; color:#155724; padding:8px; border-radius:6px; margin-bottom:8px;">¡Reserva realizada con éxito!</div>
+
+            <form id="reserva-form">
+              <input type="hidden" id="libro-seleccionado" name="libro">
+              <input type="hidden" id="categoria-seleccionada" name="categoria">
+
+              <div class="form-group">
+                <label for="idUsuario">ID de Usuario:</label>
+                <input type="text" id="idUsuario" name="idUsuario" required>
+              </div>
+
+              <div class="form-group">
+                <label for="nombreCompleto">Nombre Completo:</label>
+                <input type="text" id="nombreCompleto" name="nombreCompleto" required>
+              </div>
+
+              <div class="form-group">
+                <label for="correo">Correo Electrónico:</label>
+                <input type="email" id="correo" name="correo" required>
+              </div>
+
+              <div class="form-group">
+                <label for="fecha">Fecha de Reserva:</label>
+                <input type="date" id="fecha" name="fecha" required>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:8px;">
+                <button type="button" id="cancelar-reserva" class="btn secondary">Cancelar</button>
+                <button type="submit" class="btn">Confirmar Reserva</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    `;
+
+    function initReservas() {
+      // Reuse exact logic you provided (unchanged)
+      let todosLosLibros = [];
+      let librosFiltrados = [];
+
+      $('#categoria').change(function() {
+          const categoria = $(this).val();
+          if (categoria) {
+              cargarLibros(categoria);
+              $('#grupo-busqueda').show();
+          } else {
+              $('#resultados-container').hide();
+              $('#grupo-busqueda').hide();
+          }
+      });
+
+      $('#busqueda').keyup(function() {
+          filtrarLibros();
+      });
+
+      $('#cancelar-reserva').click(function() {
+          $('#formulario-reserva').hide();
+          $('#mensaje-exito').hide();
+      });
+
+      $('#reserva-form').submit(function(e) {
+          e.preventDefault();
+          enviarReserva();
+      });
+
+      function cargarLibros(categoria) {
+          $.ajax({
+              url: '/api/cargarLibrosPorCategoria',
+              type: 'GET',
+              data: { categoria: categoria },
+              beforeSend: function() {
+                  $('#lista-libros').html('<div class="small-muted">Cargando libros...</div>');
+              },
+              success: function(data) {
+                  todosLosLibros = data;
+                  librosFiltrados = data;
+                  mostrarLibros(data);
+                  $('#categoria-seleccionada').val(categoria);
+                  $('#resultados-container').show();
+              },
+              error: function() {
+                  alert('Error al cargar los libros');
+              }
+          });
+      }
+
+      function filtrarLibros() {
+          const busqueda = $('#busqueda').val().toLowerCase();
+          if (busqueda === '') {
+              librosFiltrados = todosLosLibros;
+          } else {
+              librosFiltrados = todosLosLibros.filter(function(libro) {
+                  return libro.titulo.toLowerCase().includes(busqueda) ||
+                         (libro.autor && libro.autor.toLowerCase().includes(busqueda));
+              });
+          }
+          mostrarLibros(librosFiltrados);
+      }
+
+      function mostrarLibros(libros) {
+          const $lista = $('#lista-libros');
+          $lista.empty();
+
+          if (!libros || libros.length === 0) {
+              $lista.html('<div class="small-muted">No se encontraron libros</div>');
+              $('#contador').text('0 libros encontrados');
+              return;
+          }
+
+          $('#contador').text(libros.length + ' libros encontrados');
+
+          libros.forEach(function(libro) {
+              $lista.append(`
+                  <div class="libro-item" style="background:#081626; padding:12px; border-radius:8px; margin-bottom:8px;" data-titulo="${libro.titulo}">
+                      <h4 style="margin:0 0 4px 0;">${libro.titulo}</h4>
+                      ${libro.autor ? `<div class="small-muted"><strong>Autor:</strong> ${libro.autor}</div>` : ''}
+                      ${libro.anioPublicacion ? `<div class="small-muted"><strong>Año:</strong> ${libro.anioPublicacion}</div>` : ''}
+                      <div style="margin-top:8px;"><button class="btn btn-seleccionar">Seleccionar</button></div>
+                  </div>
+              `);
+          });
+
+          $('.btn-seleccionar').off('click').on('click', function() {
+              const titulo = $(this).closest('.libro-item').data('titulo');
+              $('#libro-seleccionado').val(titulo);
+              $('#formulario-reserva').show();
+              $('#mensaje-exito').hide();
+              $('html, body').animate({
+                  scrollTop: $('#formulario-reserva').offset().top
+              }, 500);
+          });
+      }
+
+      function enviarReserva() {
+          const formData = $('#reserva-form').serialize();
+          $.ajax({
+              url: '/api/guardarReservaUsuario',
+              type: 'POST',
+              data: formData,
+              success: function(response) {
+                  $('#reserva-form')[0].reset();
+                  $('#mensaje-exito').fadeIn().delay(3000).fadeOut();
+              },
+              error: function() {
+                  alert('Error al realizar la reserva');
+              }
+          });
+      }
+    }
+
+    // ------- AGREGAR LIBRO VIRTUAL -------
+    const addVirtualTemplate = `
+      <section id="add-virtual-section" class="section">
+        <h3>Añadir Libro Virtual</h3>
+        <form id="agregar-libro-form">
+          <div class="form-group"><label for="av_titulo">Título del Libro:</label><input type="text" id="av_titulo" name="titulo" required></div>
+          <div class="form-group"><label for="av_url">URL del Libro:</label><input type="url" id="av_url" name="url" required></div>
+          <div class="form-group"><label for="av_autor">Autor:</label><input type="text" id="av_autor" name="autor" required></div>
+          <div class="form-group"><label for="av_descripcion">Descripción:</label><textarea id="av_descripcion" name="descripcion" required></textarea></div>
+          <div class="form-group"><label for="av_categoria">Categoría:</label>
+            <select id="av_categoria" name="categoria" required>
+              <option value="">Seleccione una categoría</option>
+              <option>Novelas</option><option>Ciencia</option><option>Historia</option><option>Arte</option><option>Fantasía</option><option>Filosofía</option>
+            </select>
+          </div>
+          <div><button type="submit" class="btn">Agregar Libro</button></div>
+        </form>
+        <div id="mensajeConfirmacionAV" style="display:none; margin-top:10px; color:#a7f3d0;">Libro agregado con éxito</div>
+        <div id="mensajeErrorAV" style="display:none; margin-top:10px; color:#fca5a5;">Hubo un error al agregar el libro</div>
+      </section>
+    `;
+
+    function initAddVirtual() {
+      $('#agregar-libro-form').off('submit').on('submit', function(e) {
+          e.preventDefault();
+          var formData = {
+              titulo: $('#av_titulo').val(),
+              url: $('#av_url').val(),
+              autor: $('#av_autor').val(),
+              descripcion: $('#av_descripcion').val(),
+              categoria: $('#av_categoria').val()
+          };
+          $.ajax({
+              url: '/api/agregarLibro',
+              type: 'POST',
+              data: formData,
+              success: function(response) {
+                  $('#mensajeConfirmacionAV').show();
+                  $('#mensajeErrorAV').hide();
+                  $('#agregar-libro-form')[0].reset();
+              },
+              error: function() {
+                  $('#mensajeErrorAV').show();
+                  $('#mensajeConfirmacionAV').hide();
+              }
+          });
+      });
+    }
+
+    // ------- AGREGAR LIBRO FISICO -------
+    const addFisicoTemplate = `
+      <section id="add-fisico-section" class="section">
+        <h3>Añadir Libro Físico</h3>
+        <form id="agregar-libro-f-form">
+          <div class="form-group"><label for="af_titulo">Título:</label><input type="text" id="af_titulo" required></div>
+          <div class="form-group"><label for="af_autor">Autor:</label><input type="text" id="af_autor" required></div>
+          <div class="form-group"><label for="af_descripcion">Descripción:</label><textarea id="af_descripcion" required></textarea></div>
+          <div class="form-group"><label for="af_categoria">Categoría:</label>
+            <select id="af_categoria" required>
+              <option value="">Seleccione una categoría</option>
+              <option>Novelas</option><option>Ciencia</option><option>Historia</option><option>Arte</option><option>Fantasía</option><option>Filosofía</option>
+            </select>
+          </div>
+          <div class="form-group"><label for="af_stock">Cantidad Disponible (Stock):</label><input type="number" id="af_stock" required></div>
+          <div class="form-group"><label for="af_reservado">Cantidad Reservada:</label><input type="number" id="af_reservado" required></div>
+          <div><button type="submit" class="btn">Agregar Libro</button></div>
+        </form>
+        <div id="mensajeConfirmacionAF" style="display:none; margin-top:10px; color:#a7f3d0;">Libro agregado con éxito</div>
+        <div id="mensajeErrorAF" style="display:none; margin-top:10px; color:#fca5a5;">Hubo un error al agregar el libro</div>
+      </section>
+    `;
+
+    function initAddFisico() {
+      $('#agregar-libro-f-form').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {
+            titulo: $('#af_titulo').val(),
+            autor: $('#af_autor').val(),
+            descripcion: $('#af_descripcion').val(),
+            categoria: $('#af_categoria').val(),
+            stock: parseInt($('#af_stock').val(), 10),
+            reservado: parseInt($('#af_reservado').val(), 10)
+        };
+        $.ajax({
+            url: '/api/agregarLibroF',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                $('#mensajeConfirmacionAF').show();
+                $('#mensajeErrorAF').hide();
+                $('#agregar-libro-f-form')[0].reset();
+            },
+            error: function() {
+                $('#mensajeErrorAF').show();
+                $('#mensajeConfirmacionAF').hide();
+            }
+        });
+      });
+    }
+
+    // ------- DEVOLUCIONES (VERSIÓN CORREGIDA) -------
+const devolucionesTemplate = `
+  <section id="devoluciones-section" class="section">
+    <h3>Devoluciones</h3>
+    <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:10px;">
+      <div style="flex:1 1 60%;" class="reservas-list section-inner">
+        <h4>Reservas Activas</h4>
+        <div class="form-group">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8;">
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Libro</th>
+              <th>Fecha Reserva</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="reservasTableBody">
+            <!-- filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="flex:1 1 35%;" class="devolucion-form section-inner">
+        <h4>Procesar Devolución</h4>
+        <form id="devolucionForm">
+          <input type="hidden" id="reservaId" name="reservaId">
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="nombre" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Libro</label>
+            <input type="text" id="libro" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Reserva</label>
+            <input type="text" id="fechaReserva" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Devolución</label>
+            <input type="date" id="fechaDevolucion" name="fechaDevolucion">
+          </div>
+
+          <div id="multaSection" style="display:none; background:#1e293b; padding:12px; border-radius:8px; margin-top:8px; border-left:4px solid #f59e0b;">
+            <h5 style="color:#f59e0b; margin-bottom:8px;">Multa por Retraso</h5>
+            <div class="form-group">
+              <label>Días de retraso</label>
+              <input type="number" id="diasRetraso" name="diasRetraso" readonly>
+            </div>
+            <div class="form-group">
+              <label>Valor de la multa (COP)</label>
+              <input type="number" id="valorMulta" name="valorMulta" readonly>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <button type="submit" class="btn">Confirmar Devolución</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+`;
+
+function initDevoluciones() {
+  // Función de búsqueda
+  $("#searchInput").on("keyup", function () {
+    const value = $(this).val().toLowerCase();
+    $("#reservasTableBody tr").filter(function () {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+    });
+  });
+
+  // Función de selección MEJORADA
+  $(document).on("click", ".seleccionar-btn", function () {
+    const nombre = $(this).data("nombre");
+    const libro = $(this).data("libro");
+    const fechaReservaStr = $(this).data("fechareserva");
+    const id = $(this).data("id");
+
+    console.log("Datos seleccionados:", { nombre, libro, fechaReservaStr, id }); // Para debug
+
+    const fechaReserva = new Date(fechaReservaStr);
+    const fechaDevolucion = new Date();
+    const diffTime = fechaDevolucion - fechaReserva;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    $("#reservaId").val(id);
+    $("#nombre").val(nombre);
+    $("#libro").val(libro);
+    $("#fechaReserva").val(fechaReserva.toLocaleDateString('es-CO'));
+
+    // Establecer fecha de devolución como hoy
+    const today = new Date().toISOString().split('T')[0];
+    $("#fechaDevolucion").val(today);
+
+    if (diffDays > 7) {
+      const diasRetraso = diffDays - 7;
+      const valorMulta = diasRetraso * 5000;
+      $("#diasRetraso").val(diasRetraso);
+      $("#valorMulta").val(valorMulta);
+      $("#multaSection").show();
+    } else {
+      $("#multaSection").hide();
+    }
+  });
+
+  // Cargar reservas activas - VERSIÓN MEJORADA
+  function cargarReservas() {
+    $.ajax({
+      url: '/api/devolucion',
+      type: 'GET',
+      success: function(html) {
+        console.log("HTML recibido:", html); // Para debug
+
+        // Extraer solo el tbody de la tabla de reservas del HTML
+        const tempDiv = $('<div>').html(html);
+        const reservasTable = tempDiv.find('#reservasTable').html();
+
+        if (reservasTable) {
+          $('#reservasTableBody').html(reservasTable);
+          console.log("Reservas cargadas correctamente");
+        } else {
+          $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No hay reservas activas</td></tr>');
+          console.log("No se encontró la tabla de reservas");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Error al cargar reservas:", error);
+        $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error al cargar las reservas: ' + error + '</td></tr>');
+      }
+    });
+  }
+
+  // Manejar envío del formulario - VERSIÓN MEJORADA
+  $('#devolucionForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const reservaId = $('#reservaId').val();
+    if (!reservaId) {
+      alert('Por favor selecciona una reserva primero');
+      return;
+    }
+
+    const formData = $(this).serialize();
+    console.log("Enviando datos:", formData); // Para debug
+
+    $.ajax({
+      url: '/api/procesar-devolucion',
+      type: 'POST',
+      data: formData,
+      success: function(response) {
+        alert('Devolución procesada exitosamente');
+        // Recargar la lista de reservas
+        cargarReservas();
+        // Limpiar formulario
+        $('#devolucionForm')[0].reset();
+        $('#multaSection').hide();
+        $('#reservaId').val('');
+      },
+      error: function(xhr, status, error) {
+        console.error("Error al procesar devolución:", error);
+        alert('Error al procesar la devolución: ' + error);
+      }
+    });
+  });
+
+  // Cargar reservas al inicializar
+  cargarReservas();
+}
+    // ------- MULTAS (NUEVA VERSIÓN MEJORADA) -------
+    const multasTemplate = `
+      <section id="multas-section" class="section">
+        <h3>Gestión de Multas</h3>
+        <div style="margin-top:12px;">
+          <input type="text" id="buscador-multas" placeholder="Buscar por nombre de usuario..."
+                 style="width:100%; padding:12px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8; margin-bottom:20px;">
+
+          <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+            <thead>
+              <tr>
+                <th style="padding:12px; background:#1e293b;">Nombre</th>
+                <th style="padding:12px; background:#1e293b;">Libro</th>
+                <th style="padding:12px; background:#1e293b;">Fecha Reserva</th>
+                <th style="padding:12px; background:#1e293b;">Fecha Devolución</th>
+                <th style="padding:12px; background:#1e293b;">Días</th>
+                <th style="padding:12px; background:#1e293b;">Valor</th>
+                <th style="padding:12px; background:#1e293b;">Estado</th>
+                <th style="padding:12px; background:#1e293b;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="multasTableBody">
+              <!-- filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Modales -->
+      <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
+        <div style="background:#1e293b; color:white; padding:30px; border-radius:12px; width:90%; max-width:420px; border:1px solid #374151;">
+          <p id="modal-message" style="margin-bottom:20px; font-size:1.1rem;">¿Estás seguro?</p>
+          <div style="display:flex; gap:12px; justify-content:center;">
+            <button id="modal-confirm" class="btn" style="background:#3b82f6;">Confirmar</button>
+            <button id="modal-cancel" class="btn secondary" style="background:#6b7280;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="alert-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
+        <div style="background:#1e293b; color:white; padding:30px; border-radius:12px; width:90%; max-width:360px; text-align:center; border:1px solid #374151;">
+          <p id="alert-message" style="margin-bottom:20px;">Operación completada</p>
+          <button id="alert-ok" class="btn" style="background:#10b981;">Aceptar</button>
+        </div>
+      </div>
+
+      <!-- Mensaje flotante -->
+      <div id="mensaje-flotante" style="display:none; position:fixed; top:20px; right:20px; background:#10b981; color:white; padding:15px 25px; border-radius:8px; z-index:1001; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
+    `;
+
+    function initMultas() {
+      // Filtro de búsqueda
+      $('#buscador-multas').on('keyup', function() {
+        const filtro = $(this).val().toLowerCase();
+        $('#multasTableBody tr').each(function() {
+          const nombre = $(this).find('td').first().text().toLowerCase();
+          $(this).toggle(nombre.includes(filtro));
+        });
+      });
+
+      // Sistema de modales
+      const modalOverlay = $('#modal-overlay'), modalMessage = $('#modal-message');
+      const alertOverlay = $('#alert-overlay'), alertMessage = $('#alert-message');
+      const mensajeFlotante = $('#mensaje-flotante');
+
+      let currentAction = null, currentRow = null, currentButton = null;
+
+      function showModal(message, action, row, button) {
+        modalMessage.text(message);
+        currentAction = action;
+        currentRow = row;
+        currentButton = button;
+        modalOverlay.css('display','flex');
+      }
+
+      function hideModal() {
+        modalOverlay.hide();
+        currentAction = null;
+        currentRow = null;
+        currentButton = null;
+      }
+
+      function showAlert(message, isSuccess = true) {
+        alertMessage.text(message);
+        alertOverlay.css('display','flex');
+
+        // Mostrar también mensaje flotante
+        mensajeFlotante.text(message);
+        mensajeFlotante.css({
+          'display': 'block',
+          'background': isSuccess ? '#10b981' : '#ef4444'
+        });
+
+        setTimeout(() => {
+          mensajeFlotante.fadeOut(300);
+        }, 3000);
+      }
+
+      $('#modal-cancel').on('click', hideModal);
+      $('#alert-ok').on('click', function(){ alertOverlay.hide(); });
+
+      $('#modal-confirm').on('click', function() {
+        if (!currentAction || !currentRow) {
+          hideModal();
+          return;
+        }
+        currentAction(currentRow, currentButton);
+        hideModal();
+      });
+
+      // Token CSRF
+      function getCsrfToken() {
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        return tokenMeta ? tokenMeta.getAttribute('content') : '';
+      }
+
+      // Funciones de acciones
+      function pagarMulta(row, button) {
+        const idMulta = $(row).data('id');
+
+        fetch(`/api/multas/pagar/${idMulta}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCsrfToken()
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            const estado = $(row).find('.estado-pago');
+            estado.text('Pagada').removeClass('no-pagada').addClass('pagada');
+            if (button) $(button).prop('disabled', true);
+            showAlert('Multa pagada correctamente', true);
+          } else {
+            showAlert('Error al pagar la multa', false);
+          }
+        })
+        .catch(() => {
+          showAlert('Error al conectar con el servidor', false);
+        });
+      }
+
+      function eliminarMulta(row) {
+        const idMulta = $(row).data('id');
+
+        fetch(`/api/multas/${idMulta}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': getCsrfToken()
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            $(row).fadeOut(300, function() {
+              $(this).remove();
+            });
+            showAlert('Multa eliminada correctamente', true);
+          } else {
+            showAlert('Error al eliminar la multa', false);
+          }
+        })
+        .catch(() => {
+          showAlert('Error al conectar con el servidor', false);
+        });
+      }
+
+      // Cargar multas
+      function cargarMultas() {
+        $.ajax({
+          url: '/api/multas',
+          type: 'GET',
+          success: function(html) {
+            // Extraer solo el tbody de la tabla de multas del HTML
+            const tempDiv = $('<div>').html(html);
+            const multasTable = tempDiv.find('.tabla-multas tbody').html();
+            $('#multasTableBody').html(multasTable);
+
+            // Re-asignar eventos a los botones después de cargar
+            $('#multasTableBody').off('click', '.btn-pagar').on('click', '.btn-pagar', function(){
+              if (this.disabled) return;
+              const row = $(this).closest('tr');
+              showModal('¿Seguro que deseas marcar esta multa como pagada?', pagarMulta, row[0], this);
+            });
+
+            $('#multasTableBody').off('click', '.btn-eliminar').on('click', '.btn-eliminar', function(){
+              const row = $(this).closest('tr');
+              showModal('¿Seguro que deseas eliminar esta multa permanentemente?', eliminarMulta, row[0], null);
+            });
+          },
+          error: function() {
+            $('#multasTableBody').html('<tr><td colspan="8" style="text-align:center; padding:20px; color:#ef4444;">Error al cargar las multas</td></tr>');
+          }
+        });
+      }
+
+      cargarMultas();
+    }
+
+    // ------- RESEÑAS (NUEVA VERSIÓN MEJORADA) -------
+    const resenasTemplate = `
+      <section id="resenas-section" class="section">
+        <h3>Reseñas de Usuarios</h3>
+        <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+          <thead>
+            <tr>
+              <th style="padding:12px; background:#1e293b;">Nombre</th>
+              <th style="padding:12px; background:#1e293b;">Comentario</th>
+            </tr>
+          </thead>
+          <tbody id="resenasBody">
+            <!-- filas dinámicas -->
+          </tbody>
+        </table>
+      </section>
+    `;
+
+    function initResenas() {
+      function cargarResenas() {
+        $.ajax({
+          url: '/api/resenasAdmin',
+          type: 'GET',
+          success: function(html) {
+            // Extraer solo el tbody de la tabla de reseñas del HTML
+            const tempDiv = $('<div>').html(html);
+            const resenasTable = tempDiv.find('.tabla-resenas tbody').html();
+            $('#resenasBody').html(resenasTable);
+          },
+          error: function() {
+            $('#resenasBody').html('<tr><td colspan="2" style="text-align:center; padding:20px; color:#ef4444;">Error al cargar las reseñas</td></tr>');
+          }
+        });
+      }
+
+      cargarResenas();
+    }
+
+    /**************************************************************************
+     * Section loader: replace #main-area content with the chosen template,
+     * then call the corresponding initializer.
+     **************************************************************************/
+    function loadSection(name) {
+      // mark active
+      $('#menu a').removeClass('active');
+      $(`#menu a[data-section="${name}"]`).addClass('active');
+
+      const $main = $('#main-area');
+
+      switch(name) {
+        case 'dashboard':
+          $main.html(`
+            <section id="dashboard-section" class="section">
+              <div class="dashboard-cards">
+                <div class="card"><i class="fas fa-users"></i><h3>Usuarios</h3><p class="small-muted">1,245 registrados</p></div>
+                <div class="card"><i class="fas fa-book"></i><h3>Libros Virtuales</h3><p class="small-muted">3,456 disponibles</p></div>
+                <div class="card"><i class="fas fa-book-reader"></i><h3>Reservas</h3><p class="small-muted">553 activas</p></div>
+                <div class="card"><i class="fas fa-star"></i><h3>Valoración Promedio</h3><p class="small-muted">4.8 / 5</p></div>
+              </div>
+              <div class="section" style="margin-top:12px;"><h4>Dashboard PowerBI</h4><p class="small-muted">Consulta las métricas del sistema.</p>
+                <a class="btn" target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9">Ver Dashboard</a>
+              </div>
+            </section>
+          `);
+          break;
+
+        case 'reservas':
+          $main.html(reservasTemplate);
+          initReservas();
+          break;
+
+        case 'addVirtual':
+          $main.html(addVirtualTemplate);
+          initAddVirtual();
+          break;
+
+        case 'addFisico':
+          $main.html(addFisicoTemplate);
+          initAddFisico();
+          break;
+
+        case 'devoluciones':
+          $main.html(devolucionesTemplate);
+          initDevoluciones();
+          break;
+
+        case 'multas':
+          $main.html(multasTemplate);
+          initMultas();
+          break;
+
+        case 'resenas':
+          $main.html(resenasTemplate);
+          initResenas();
+          break;
+
+        default:
+          $main.html('<p>Sección no encontrada.</p>');
+      }
+
+      // scroll to top of main
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Attach menu handlers
+$(document).ready(function() {
+$('#menu a').on('click', function(e){
+e.preventDefault();
+const sec = $(this).data('section');
+loadSection(sec);
+// close sidebar on small screens (optional)
+if (window.innerWidth <= 900) $('#sidebar').removeClass('open');
+});
+
+// initial
+loadSection('dashboard');
+});
+
+// Optional: toggle sidebar on small screens (you can add a button if you want)
+// Example: document.getElementById('toggle-sidebar-btn').addEventListener...
+</script>
 </body>
 </html>

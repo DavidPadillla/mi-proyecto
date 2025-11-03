@@ -12,80 +12,106 @@ body {
     color: #2c3e50;
 }
 
-/* Header */
-header {
-    background: #ffffff;
-    padding: 20px 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-nav {
+/* Header / Navbar */
+.navbar {
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
+    padding: 15px 60px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo h1 {
     font-size: 2rem;
+    font-weight: 700;
     color: #2c3e50;
 }
 
 .logo span {
     color: #27ae60;
+    font-weight: 600;
 }
 
 .nav-links {
-    list-style: none;
     display: flex;
-    gap: 25px;
+    align-items: center;
+    gap: 20px;
 }
 
-.nav-links li a {
-    text-decoration: none;
-    color: #2c3e50;
-    font-weight: 500;
-    transition: color 0.3s;
+.nav-links a {
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
 }
 
-.nav-links li a:hover {
-    color: #27ae60;
+.nav-links a:hover,
+.nav-links a.active {
+  background-color: #27ae60;
+  color: #fff;
 }
 
+/* User Info */
 .user-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+    color: #2c3e50;
 }
 
-.logout-btn {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
+/* Botón Cerrar Sesión */
+.btn-salir {
+    background: transparent;
+    color: #2c3e50;
     font-weight: 500;
+    padding: 8px 15px;
+    border: 1px solid #2c3e50;
+    border-radius: 25px;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.logout-btn:hover {
-    background-color: #c0392b;
+.btn-salir:hover {
+    background: #2c3e50;
+    color: #fff;
 }
 
-/* Hero Section */
-.hero {
+/* Hero Section CON VIDEO */
+.hero-video-container {
+    position: relative;
+    width: 100%;
+    height: 80vh; /* altura de la sección hero */
+    overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    padding: 60px 20px;
-    background: #dff9fb;
+    justify-content: flex-start;
+    padding-left: 60px; /* espacio para el texto */
+    box-sizing: border-box;
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
 }
 
 .hero-text {
+    position: relative;
+    z-index: 2;
     max-width: 500px;
+    color: #ffffff; /* para que resalte sobre el video */
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.7);
 }
 
 .hero-text .collection {
@@ -101,7 +127,7 @@ nav {
 
 .hero-text .description {
     font-size: 1.2rem;
-    color: #7f8c8d;
+    color: #f0f0f0;
     margin-bottom: 30px;
 }
 
@@ -118,12 +144,6 @@ nav {
 
 .hero-text .btn:hover {
     background-color: #219150;
-}
-
-.hero-image img {
-    max-width: 400px;
-    width: 100%;
-    border-radius: 15px;
 }
 
 /* Secciones Generales */
@@ -266,14 +286,6 @@ nav {
     color: #7f8c8d;
 }
 
-/* Footer */
-footer {
-    background: #2c3e50;
-    color: #ffffff;
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9rem;
-}
 /* Reseñas */
 .reseñas {
     background-color: #ffffff;
@@ -333,4 +345,60 @@ footer {
     font-size: 1rem;
     color: #27ae60;
     font-weight: 500;
+}
+
+/* Mensaje flotante */
+.mensaje-exito {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 10px;
+    display: none;
+    z-index: 2000;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Footer */
+footer {
+    background: #2c3e50;
+    color: #ffffff;
+    text-align: center;
+    padding: 25px 20px;
+    margin-top: 40px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .hero-text {
+        max-width: 400px;
+        padding-left: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 20px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .shop-container, .autores-container, .contact-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-video-container {
+        height: 60vh;
+        padding-left: 20px;
+    }
 }

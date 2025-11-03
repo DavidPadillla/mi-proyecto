@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/index",
+                                "/intro",
+                                "/api/index",
                                 "/api/register",
                                 "/api/login",
                                 "/estilos/**",
@@ -48,6 +49,7 @@ public class SecurityConfig {
                                 "/login",
                                 "/api/librosVirtuales"
                         ).permitAll()
+
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/logiado/**").hasRole("USER")
                         .anyRequest().authenticated()
@@ -61,7 +63,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
-                        .logoutSuccessUrl("/api/index") 
+                        .logoutSuccessUrl("/api/index")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
