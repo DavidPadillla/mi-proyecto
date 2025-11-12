@@ -13,8 +13,8 @@ public class LibroFisicoModel {
     private String autor;
     private String descripcion;
     private String categoria;
-    private int stock;// Cantidad disponible
-    private int reservado;
+    private int stock = 0;      // 🔹 Valor inicial por defecto
+    private int reservado = 0;
 
 
     public LibroFisicoModel() {}

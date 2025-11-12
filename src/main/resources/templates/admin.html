@@ -3,74 +3,469 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Lectio - Panel de Administración (Unificado)</title>
+    <title>Lectio - Panel de Administración</title>
 
     <!-- Font Awesome + Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* ====== Estilos base (tomados y adaptados de tu adminLectio.css) ====== */
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
-        body { display:flex; min-height:100vh; background:#101827; color:#e5e7eb; }
-
-        /* Sidebar */
-        .sidebar { width:260px; background:#111827; padding:30px 20px; position:fixed; height:100%; border-right:1px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; }
-        .logo { display:flex; align-items:center; gap:10px; color:#3b82f6; font-size:1.5rem; font-weight:600; margin-bottom:40px; }
-        .logo i { font-size:1.6rem; }
-        .menu { list-style:none; flex-grow:1; }
-        .menu li { margin-bottom:15px; }
-        .menu a { display:flex; align-items:center; gap:12px; text-decoration:none; color:#9ca3af; font-weight:500; padding:10px 15px; border-radius:10px; transition:0.2s; cursor:pointer; }
-        .menu a:hover, .menu a.active { background:#1e293b; color:#fff; }
-        .logout { margin-top:auto; }
-        .logout button { width:100%; background:#ef4444; border:none; padding:10px; color:white; border-radius:8px; font-weight:600; cursor:pointer; }
-        .logout button:hover { background:#dc2626; }
-
-        /* Main */
-        .main-content { margin-left:260px; flex:1; padding:36px; background:#0f172a; min-height:100vh; overflow:auto; }
-        .header-title { margin-bottom:18px; }
-        .header-title h2 { font-size:2rem; color:#fff; }
-        .header-title p { color:#94a3b8; margin-top:6px; }
-
-        /* Dashboard cards */
-        .dashboard-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin:18px 0 30px; }
-        .card { background:#1e293b; padding:22px; border-radius:12px; text-align:center; transition:0.18s; }
-        .card i { font-size:1.7rem; color:#3b82f6; }
-        .card h3 { color:#fff; margin-top:12px; font-size:1.15rem; }
-        .card p { color:#9ca3af; margin-top:8px; }
-
-        /* Section wrapper */
-        .section-wrapper { background:#0f172a; padding:12px; border-radius:10px; }
-        .section { background:#071028; padding:18px; border-radius:10px; box-shadow: 0 6px 18px rgba(0,0,0,0.4); color:#e6eef8; }
-
-        /* Simple form styling used by sections */
-        .form-group { margin-bottom:12px; }
-        label { display:block; margin-bottom:6px; color:#cbd5e1; font-weight:500; }
-        input[type="text"], input[type="email"], input[type="date"], input[type="number"], select, textarea {
-          width:100%; padding:10px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8; outline:none;
+        /* ====== VARIABLES Y ESTILOS BASE ====== */
+        :root {
+            --primary: #2c5aa0;
+            --primary-dark: #1e3d72;
+            --primary-light: #4a7fd4;
+            --secondary: #f8f9fa;
+            --accent: #28a745;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+            --border: #e9ecef;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
         }
-        textarea { min-height:90px; resize:vertical; }
-        .btn { display:inline-block; background:#3b82f6; color:white; padding:10px 18px; border-radius:999px; text-decoration:none; cursor:pointer; border:none; font-weight:600; }
-        .btn.secondary { background:#6b7280; }
-        table { width:100%; border-collapse:collapse; margin-top:10px; color:#e6eef8; }
-        th, td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.03); text-align:left; font-size:0.95rem; color:#cbd5e1; }
-        thead th { background:#0b1a2b; color:#94a3b8; position:sticky; top:0; z-index:2; }
-        .small-muted { color:#94a3b8; font-size:0.9rem; }
 
-        /* Responsive */
-        @media (max-width:900px) {
-          .sidebar { position:fixed; transform:translateX(-100%); transition:transform .25s; z-index:30; }
-          .sidebar.open { transform:translateX(0); }
-          .main-content { margin-left:0; padding:20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f7fb;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* ====== SIDEBAR ELEGANTE ====== */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .menu li {
+            margin-bottom: 8px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .menu a:hover {
+            background: rgba(44, 90, 160, 0.05);
+            color: var(--primary);
+        }
+
+        .menu a.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(44, 90, 160, 0.2);
+        }
+
+        .logout {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #e74c3c;
+            padding: 12px;
+            color: #e74c3c;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout button:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* ====== CONTENIDO PRINCIPAL ====== */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+            background: #f5f7fb;
+            min-height: 100vh;
+            overflow: auto;
+        }
+
+        .header-title {
+            margin-bottom: 30px;
+        }
+
+        .header-title h2 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-title p {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        /* ====== TARJETAS DEL DASHBOARD ====== */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin: 25px 0 35px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 28px;
+            border-radius: var(--radius);
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card i {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* ====== SECCIONES ====== */
+        .section-wrapper {
+            background: transparent;
+            padding: 0;
+        }
+
+        .section {
+            background: var(--white);
+            padding: 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .section h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ====== FORMULARIOS ELEGANTES ====== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"], input[type="email"], input[type="date"],
+        input[type="number"], input[type="url"], select, textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--text-dark);
+            outline: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 14px 26px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(44, 90, 160, 0.2);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(44, 90, 160, 0.3);
+        }
+
+        .btn.secondary {
+            background: var(--text-light);
+        }
+
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+
+        /* ====== TABLAS ELEGANTES ====== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        thead th {
+            background: var(--primary);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(44, 90, 160, 0.03);
+        }
+
+        .small-muted {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* ====== ELEMENTOS ESPECÍFICOS ====== */
+        .libro-item {
+            background: var(--secondary);
+            padding: 18px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        .libro-item:hover {
+            background: rgba(44, 90, 160, 0.05);
+        }
+
+        /* ====== MODALES Y MENSAJES ====== */
+        #modal-overlay, #alert-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content, .alert-content {
+            background: var(--white);
+            color: var(--text-dark);
+            padding: 32px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 450px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        #mensaje-flotante {
+            display: none;
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            z-index: 1001;
+            box-shadow: var(--shadow-lg);
+            font-weight: 500;
+        }
+
+        /* ====== DASHBOARD EMBEBIDO ====== */
+        .dashboard-embed {
+            width: 100%;
+            height: 750px;
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: var(--white);
+        }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: var(--radius);
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 101;
+                cursor: pointer;
+                box-shadow: var(--shadow);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .dashboard-embed {
+                height: 500px;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- Botón para móviles -->
+<button class="menu-toggle" id="menuToggle" style="display: none;">
+    <i class="fas fa-bars"></i>
+</button>
+
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div>
-        <div class="logo"><i class="fas fa-book-open"></i><div> <strong>Lectio</strong></div></div>
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <div>Lectio</div>
+        </div>
 
         <ul class="menu" id="menu">
             <li><a data-section="dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -80,7 +475,6 @@
             <li><a data-section="devoluciones"><i class="fas fa-undo"></i> Devoluciones</a></li>
             <li><a data-section="multas"><i class="fas fa-money-bill-wave"></i> Multas</a></li>
             <li><a data-section="resenas"><i class="fas fa-star"></i> Reseñas</a></li>
-            <!-- Eliminado: Usuarios -->
         </ul>
     </div>
 
@@ -93,7 +487,7 @@
 <main class="main-content">
     <div class="header-title">
         <h2>Panel de Administración</h2>
-        <p>Bienvenido al centro de control de Lectio 📚</p>
+        <p>Bienvenido al centro de control de Lectio</p>
     </div>
 
     <!-- Main area where sections will be injected -->
@@ -101,33 +495,48 @@
         <!-- Initial dashboard content -->
         <section id="dashboard-section" class="section">
             <div class="dashboard-cards">
-                <div class="card"><i class="fas fa-users"></i><h3>Usuarios</h3><p class="small-muted">1,245 registrados</p></div>
-                <div class="card"><i class="fas fa-book"></i><h3>Libros Virtuales</h3><p class="small-muted">3,456 disponibles</p></div>
-                <div class="card"><i class="fas fa-book-reader"></i><h3>Reservas</h3><p class="small-muted">553 activas</p></div>
-                <div class="card"><i class="fas fa-star"></i><h3>Valoración Promedio</h3><p class="small-muted">4.8 / 5</p></div>
+                <div class="card">
+                    <i class="fas fa-users"></i>
+                    <h3>Usuarios Registrados</h3>
+                    <p class="small-muted">1,245 registrados</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-book"></i>
+                    <h3>Libros Virtuales</h3>
+                    <p class="small-muted">3,456 disponibles</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-book-reader"></i>
+                    <h3>Reservas Activas</h3>
+                    <p class="small-muted">553 activas</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-star"></i>
+                    <h3>Valoración Promedio</h3>
+                    <p class="small-muted">4.8 / 5</p>
+                </div>
             </div>
 
-            <div class="dashboard-links section" style="margin-top:16px;">
-                <h3>Dashboard PowerBI</h3>
-                <p class="small-muted">Consulta las métricas y estadísticas del sistema.</p>
-                <a class="btn" target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9">Ver Dashboard</a>
+            <div class="section">
+                <h3>Dashboard Analítico</h3>
+                <p class="small-muted" style="margin-bottom: 20px;">Métricas y estadísticas del sistema en tiempo real</p>
+                <iframe
+                        class="dashboard-embed"
+                        src="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+                        frameborder="0"
+                        allowFullScreen="true">
+                </iframe>
             </div>
         </section>
     </div>
-
 </main>
 
-<!-- jQuery (tu código original usa jQuery) -->
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     /**************************************************************************
-     * Templates for each section (raw HTML strings). When a menu item is
-     * selected we inject the corresponding template into #main-area and call
-     * its initializer function (initReservas, initAddVirtual, ...).
-     *
-     * I preserved your original markup and JS logic — only reorganized them
-     * into init functions so they run safely when the section is inserted.
+     * Templates para cada sección (funcionales desde tu código original)
      **************************************************************************/
 
     // ------- RESERVAS (plantilla y init) -------
@@ -140,7 +549,6 @@
             <label for="categoria">Categoría:</label>
             <select id="categoria" required>
               <option value="" disabled selected>Selecciona una categoría</option>
-              <!-- Las opciones pueden venir desde el servidor en el render, o cargarlas dinámicamente -->
               <option>Novelas</option>
               <option>Ciencia</option>
               <option>Historia</option>
@@ -199,7 +607,6 @@
     `;
 
     function initReservas() {
-      // Reuse exact logic you provided (unchanged)
       let todosLosLibros = [];
       let librosFiltrados = [];
 
@@ -276,7 +683,7 @@
 
           libros.forEach(function(libro) {
               $lista.append(`
-                  <div class="libro-item" style="background:#081626; padding:12px; border-radius:8px; margin-bottom:8px;" data-titulo="${libro.titulo}">
+                  <div class="libro-item" data-titulo="${libro.titulo}">
                       <h4 style="margin:0 0 4px 0;">${libro.titulo}</h4>
                       ${libro.autor ? `<div class="small-muted"><strong>Autor:</strong> ${libro.autor}</div>` : ''}
                       ${libro.anioPublicacion ? `<div class="small-muted"><strong>Año:</strong> ${libro.anioPublicacion}</div>` : ''}
@@ -414,202 +821,192 @@
       });
     }
 
-    // ------- DEVOLUCIONES (VERSIÓN CORREGIDA) -------
-const devolucionesTemplate = `
-  <section id="devoluciones-section" class="section">
-    <h3>Devoluciones</h3>
-    <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:10px;">
-      <div style="flex:1 1 60%;" class="reservas-list section-inner">
-        <h4>Reservas Activas</h4>
-        <div class="form-group">
-          <input type="text" id="searchInput" placeholder="Buscar por nombre..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8;">
+    // ------- DEVOLUCIONES -------
+    const devolucionesTemplate = `
+      <section id="devoluciones-section" class="section">
+        <h3>Devoluciones</h3>
+        <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:10px;">
+          <div style="flex:1 1 60%;" class="reservas-list section-inner">
+            <h4>Reservas Activas</h4>
+            <div class="form-group">
+              <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Libro</th>
+                  <th>Fecha Reserva</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="reservasTableBody">
+                <!-- filas dinámicas -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="flex:1 1 35%;" class="devolucion-form section-inner">
+            <h4>Procesar Devolución</h4>
+            <form id="devolucionForm">
+              <input type="hidden" id="reservaId" name="reservaId">
+
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Libro</label>
+                <input type="text" id="libro" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Fecha de Reserva</label>
+                <input type="text" id="fechaReserva" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Fecha de Devolución</label>
+                <input type="date" id="fechaDevolucion" name="fechaDevolucion">
+              </div>
+
+              <div id="multaSection" style="display:none; background:#fff3cd; padding:12px; border-radius:8px; margin-top:8px; border-left:4px solid #ffc107;">
+                <h5 style="color:#856404; margin-bottom:8px;">Multa por Retraso</h5>
+                <div class="form-group">
+                  <label>Días de retraso</label>
+                  <input type="number" id="diasRetraso" name="diasRetraso" readonly>
+                </div>
+                <div class="form-group">
+                  <label>Valor de la multa (COP)</label>
+                  <input type="number" id="valorMulta" name="valorMulta" readonly>
+                </div>
+              </div>
+
+              <div style="margin-top:12px;">
+                <button type="submit" class="btn">Confirmar Devolución</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Libro</th>
-              <th>Fecha Reserva</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="reservasTableBody">
-            <!-- filas dinámicas -->
-          </tbody>
-        </table>
-      </div>
+      </section>
+    `;
 
-      <div style="flex:1 1 35%;" class="devolucion-form section-inner">
-        <h4>Procesar Devolución</h4>
-        <form id="devolucionForm">
-          <input type="hidden" id="reservaId" name="reservaId">
+    function initDevoluciones() {
+      // Función de búsqueda
+      $("#searchInput").on("keyup", function () {
+        const value = $(this).val().toLowerCase();
+        $("#reservasTableBody tr").filter(function () {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
 
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" id="nombre" readonly>
-          </div>
+      // Función de selección MEJORADA
+      $(document).on("click", ".seleccionar-btn", function () {
+        const nombre = $(this).data("nombre");
+        const libro = $(this).data("libro");
+        const fechaReservaStr = $(this).data("fechareserva");
+        const id = $(this).data("id");
 
-          <div class="form-group">
-            <label>Libro</label>
-            <input type="text" id="libro" readonly>
-          </div>
+        const fechaReserva = new Date(fechaReservaStr);
+        const fechaDevolucion = new Date();
+        const diffTime = fechaDevolucion - fechaReserva;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-          <div class="form-group">
-            <label>Fecha de Reserva</label>
-            <input type="text" id="fechaReserva" readonly>
-          </div>
+        $("#reservaId").val(id);
+        $("#nombre").val(nombre);
+        $("#libro").val(libro);
+        $("#fechaReserva").val(fechaReserva.toLocaleDateString('es-CO'));
 
-          <div class="form-group">
-            <label>Fecha de Devolución</label>
-            <input type="date" id="fechaDevolucion" name="fechaDevolucion">
-          </div>
+        // Establecer fecha de devolución como hoy
+        const today = new Date().toISOString().split('T')[0];
+        $("#fechaDevolucion").val(today);
 
-          <div id="multaSection" style="display:none; background:#1e293b; padding:12px; border-radius:8px; margin-top:8px; border-left:4px solid #f59e0b;">
-            <h5 style="color:#f59e0b; margin-bottom:8px;">Multa por Retraso</h5>
-            <div class="form-group">
-              <label>Días de retraso</label>
-              <input type="number" id="diasRetraso" name="diasRetraso" readonly>
-            </div>
-            <div class="form-group">
-              <label>Valor de la multa (COP)</label>
-              <input type="number" id="valorMulta" name="valorMulta" readonly>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <button type="submit" class="btn">Confirmar Devolución</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
-`;
-
-function initDevoluciones() {
-  // Función de búsqueda
-  $("#searchInput").on("keyup", function () {
-    const value = $(this).val().toLowerCase();
-    $("#reservasTableBody tr").filter(function () {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-    });
-  });
-
-  // Función de selección MEJORADA
-  $(document).on("click", ".seleccionar-btn", function () {
-    const nombre = $(this).data("nombre");
-    const libro = $(this).data("libro");
-    const fechaReservaStr = $(this).data("fechareserva");
-    const id = $(this).data("id");
-
-    console.log("Datos seleccionados:", { nombre, libro, fechaReservaStr, id }); // Para debug
-
-    const fechaReserva = new Date(fechaReservaStr);
-    const fechaDevolucion = new Date();
-    const diffTime = fechaDevolucion - fechaReserva;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    $("#reservaId").val(id);
-    $("#nombre").val(nombre);
-    $("#libro").val(libro);
-    $("#fechaReserva").val(fechaReserva.toLocaleDateString('es-CO'));
-
-    // Establecer fecha de devolución como hoy
-    const today = new Date().toISOString().split('T')[0];
-    $("#fechaDevolucion").val(today);
-
-    if (diffDays > 7) {
-      const diasRetraso = diffDays - 7;
-      const valorMulta = diasRetraso * 5000;
-      $("#diasRetraso").val(diasRetraso);
-      $("#valorMulta").val(valorMulta);
-      $("#multaSection").show();
-    } else {
-      $("#multaSection").hide();
-    }
-  });
-
-  // Cargar reservas activas - VERSIÓN MEJORADA
-  function cargarReservas() {
-    $.ajax({
-      url: '/api/devolucion',
-      type: 'GET',
-      success: function(html) {
-        console.log("HTML recibido:", html); // Para debug
-
-        // Extraer solo el tbody de la tabla de reservas del HTML
-        const tempDiv = $('<div>').html(html);
-        const reservasTable = tempDiv.find('#reservasTable').html();
-
-        if (reservasTable) {
-          $('#reservasTableBody').html(reservasTable);
-          console.log("Reservas cargadas correctamente");
+        if (diffDays > 7) {
+          const diasRetraso = diffDays - 7;
+          const valorMulta = diasRetraso * 5000;
+          $("#diasRetraso").val(diasRetraso);
+          $("#valorMulta").val(valorMulta);
+          $("#multaSection").show();
         } else {
-          $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No hay reservas activas</td></tr>');
-          console.log("No se encontró la tabla de reservas");
+          $("#multaSection").hide();
         }
-      },
-      error: function(xhr, status, error) {
-        console.error("Error al cargar reservas:", error);
-        $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error al cargar las reservas: ' + error + '</td></tr>');
+      });
+
+      // Cargar reservas activas - VERSIÓN MEJORADA
+      function cargarReservas() {
+        $.ajax({
+          url: '/api/devolucion',
+          type: 'GET',
+          success: function(html) {
+            const tempDiv = $('<div>').html(html);
+            const reservasTable = tempDiv.find('#reservasTable').html();
+
+            if (reservasTable) {
+              $('#reservasTableBody').html(reservasTable);
+            } else {
+              $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No hay reservas activas</td></tr>');
+            }
+          },
+          error: function(xhr, status, error) {
+            $('#reservasTableBody').html('<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error al cargar las reservas: ' + error + '</td></tr>');
+          }
+        });
       }
-    });
-  }
 
-  // Manejar envío del formulario - VERSIÓN MEJORADA
-  $('#devolucionForm').on('submit', function(e) {
-    e.preventDefault();
+      // Manejar envío del formulario - VERSIÓN MEJORADA
+      $('#devolucionForm').on('submit', function(e) {
+        e.preventDefault();
 
-    const reservaId = $('#reservaId').val();
-    if (!reservaId) {
-      alert('Por favor selecciona una reserva primero');
-      return;
+        const reservaId = $('#reservaId').val();
+        if (!reservaId) {
+          alert('Por favor selecciona una reserva primero');
+          return;
+        }
+
+        const formData = $(this).serialize();
+
+        $.ajax({
+          url: '/api/procesar-devolucion',
+          type: 'POST',
+          data: formData,
+          success: function(response) {
+            alert('Devolución procesada exitosamente');
+            // Recargar la lista de reservas
+            cargarReservas();
+            // Limpiar formulario
+            $('#devolucionForm')[0].reset();
+            $('#multaSection').hide();
+            $('#reservaId').val('');
+          },
+          error: function(xhr, status, error) {
+            alert('Error al procesar la devolución: ' + error);
+          }
+        });
+      });
+
+      // Cargar reservas al inicializar
+      cargarReservas();
     }
 
-    const formData = $(this).serialize();
-    console.log("Enviando datos:", formData); // Para debug
-
-    $.ajax({
-      url: '/api/procesar-devolucion',
-      type: 'POST',
-      data: formData,
-      success: function(response) {
-        alert('Devolución procesada exitosamente');
-        // Recargar la lista de reservas
-        cargarReservas();
-        // Limpiar formulario
-        $('#devolucionForm')[0].reset();
-        $('#multaSection').hide();
-        $('#reservaId').val('');
-      },
-      error: function(xhr, status, error) {
-        console.error("Error al procesar devolución:", error);
-        alert('Error al procesar la devolución: ' + error);
-      }
-    });
-  });
-
-  // Cargar reservas al inicializar
-  cargarReservas();
-}
-    // ------- MULTAS (NUEVA VERSIÓN MEJORADA) -------
+    // ------- MULTAS -------
     const multasTemplate = `
       <section id="multas-section" class="section">
         <h3>Gestión de Multas</h3>
         <div style="margin-top:12px;">
-          <input type="text" id="buscador-multas" placeholder="Buscar por nombre de usuario..."
-                 style="width:100%; padding:12px; border-radius:8px; border:1px solid #263244; background:#0b1220; color:#e6eef8; margin-bottom:20px;">
+          <input type="text" id="buscador-multas" placeholder="Buscar por nombre de usuario...">
 
           <table style="width:100%; border-collapse:collapse; margin-top:12px;">
             <thead>
               <tr>
-                <th style="padding:12px; background:#1e293b;">Nombre</th>
-                <th style="padding:12px; background:#1e293b;">Libro</th>
-                <th style="padding:12px; background:#1e293b;">Fecha Reserva</th>
-                <th style="padding:12px; background:#1e293b;">Fecha Devolución</th>
-                <th style="padding:12px; background:#1e293b;">Días</th>
-                <th style="padding:12px; background:#1e293b;">Valor</th>
-                <th style="padding:12px; background:#1e293b;">Estado</th>
-                <th style="padding:12px; background:#1e293b;">Acciones</th>
+                <th>Nombre</th>
+                <th>Libro</th>
+                <th>Fecha Reserva</th>
+                <th>Fecha Devolución</th>
+                <th>Días</th>
+                <th>Valor</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="multasTableBody">
@@ -621,19 +1018,19 @@ function initDevoluciones() {
 
       <!-- Modales -->
       <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
-        <div style="background:#1e293b; color:white; padding:30px; border-radius:12px; width:90%; max-width:420px; border:1px solid #374151;">
+        <div class="modal-content">
           <p id="modal-message" style="margin-bottom:20px; font-size:1.1rem;">¿Estás seguro?</p>
           <div style="display:flex; gap:12px; justify-content:center;">
-            <button id="modal-confirm" class="btn" style="background:#3b82f6;">Confirmar</button>
-            <button id="modal-cancel" class="btn secondary" style="background:#6b7280;">Cancelar</button>
+            <button id="modal-confirm" class="btn">Confirmar</button>
+            <button id="modal-cancel" class="btn secondary">Cancelar</button>
           </div>
         </div>
       </div>
 
       <div id="alert-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
-        <div style="background:#1e293b; color:white; padding:30px; border-radius:12px; width:90%; max-width:360px; text-align:center; border:1px solid #374151;">
+        <div class="alert-content">
           <p id="alert-message" style="margin-bottom:20px;">Operación completada</p>
-          <button id="alert-ok" class="btn" style="background:#10b981;">Aceptar</button>
+          <button id="alert-ok" class="btn">Aceptar</button>
         </div>
       </div>
 
@@ -790,15 +1187,15 @@ function initDevoluciones() {
       cargarMultas();
     }
 
-    // ------- RESEÑAS (NUEVA VERSIÓN MEJORADA) -------
+    // ------- RESEÑAS -------
     const resenasTemplate = `
       <section id="resenas-section" class="section">
         <h3>Reseñas de Usuarios</h3>
         <table style="width:100%; border-collapse:collapse; margin-top:12px;">
           <thead>
             <tr>
-              <th style="padding:12px; background:#1e293b;">Nombre</th>
-              <th style="padding:12px; background:#1e293b;">Comentario</th>
+              <th>Nombre</th>
+              <th>Comentario</th>
             </tr>
           </thead>
           <tbody id="resenasBody">
@@ -844,13 +1241,37 @@ function initDevoluciones() {
           $main.html(`
             <section id="dashboard-section" class="section">
               <div class="dashboard-cards">
-                <div class="card"><i class="fas fa-users"></i><h3>Usuarios</h3><p class="small-muted">1,245 registrados</p></div>
-                <div class="card"><i class="fas fa-book"></i><h3>Libros Virtuales</h3><p class="small-muted">3,456 disponibles</p></div>
-                <div class="card"><i class="fas fa-book-reader"></i><h3>Reservas</h3><p class="small-muted">553 activas</p></div>
-                <div class="card"><i class="fas fa-star"></i><h3>Valoración Promedio</h3><p class="small-muted">4.8 / 5</p></div>
+                <div class="card">
+                  <i class="fas fa-users"></i>
+                  <h3>Usuarios Registrados</h3>
+                  <p class="small-muted">1,245 registrados</p>
+                </div>
+                <div class="card">
+                  <i class="fas fa-book"></i>
+                  <h3>Libros Virtuales</h3>
+                  <p class="small-muted">3,456 disponibles</p>
+                </div>
+                <div class="card">
+                  <i class="fas fa-book-reader"></i>
+                  <h3>Reservas Activas</h3>
+                  <p class="small-muted">553 activas</p>
+                </div>
+                <div class="card">
+                  <i class="fas fa-star"></i>
+                  <h3>Valoración Promedio</h3>
+                  <p class="small-muted">4.8 / 5</p>
+                </div>
               </div>
-              <div class="section" style="margin-top:12px;"><h4>Dashboard PowerBI</h4><p class="small-muted">Consulta las métricas del sistema.</p>
-                <a class="btn" target="_blank" href="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9">Ver Dashboard</a>
+
+              <div class="section">
+                <h3>Dashboard Analítico</h3>
+                <p class="small-muted" style="margin-bottom: 20px;">Métricas y estadísticas del sistema en tiempo real</p>
+                <iframe
+                    class="dashboard-embed"
+                    src="https://app.powerbi.com/view?r=eyJrIjoiZjMwNzIyZDUtNmJmYS00YjJhLTg1M2UtYTc5N2Q0MDFhM2IzIiwidCI6IjlkMTJiZjNmLWU0ZjYtNDdhYi05MTJmLTFhMmYwZmM0OGFhNCIsImMiOjR9"
+                    frameborder="0"
+                    allowFullScreen="true">
+                </iframe>
               </div>
             </section>
           `);
@@ -892,24 +1313,42 @@ function initDevoluciones() {
 
       // scroll to top of main
       window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    }
 
-// Attach menu handlers
-$(document).ready(function() {
-$('#menu a').on('click', function(e){
-e.preventDefault();
-const sec = $(this).data('section');
-loadSection(sec);
-// close sidebar on small screens (optional)
-if (window.innerWidth <= 900) $('#sidebar').removeClass('open');
-});
+    // Attach menu handlers
+    $(document).ready(function() {
+      $('#menu a').on('click', function(e){
+        e.preventDefault();
+        const sec = $(this).data('section');
+        loadSection(sec);
+        // close sidebar on small screens (optional)
+        if (window.innerWidth <= 900) $('#sidebar').removeClass('open');
+      });
 
-// initial
-loadSection('dashboard');
-});
+      // Responsive menu toggle
+      $('#menuToggle').on('click', function() {
+        $('#sidebar').toggleClass('open');
+      });
 
-// Optional: toggle sidebar on small screens (you can add a button if you want)
-// Example: document.getElementById('toggle-sidebar-btn').addEventListener...
+      // Check screen size and show/hide menu toggle
+      function checkScreenSize() {
+        if (window.innerWidth <= 1024) {
+          $('#menuToggle').show();
+        } else {
+          $('#menuToggle').hide();
+          $('#sidebar').removeClass('open');
+        }
+      }
+
+      // Initial check
+      checkScreenSize();
+
+      // Check on resize
+      $(window).on('resize', checkScreenSize);
+
+      // initial
+      loadSection('dashboard');
+    });
 </script>
 </body>
 </html>

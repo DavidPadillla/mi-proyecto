@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Desafío - El Principito</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      color: #EAEAEA;
+      background: linear-gradient(to bottom, #1b2735 0%, #0d121c 100%);
+      position: relative;
+      margin-right: 310px;
+      overflow-x: hidden;
+    }
+
+    .background-stars {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .estrella {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: #FFECB3;
+        border-radius: 50%;
+        opacity: 0;
+        animation: brillar 12s linear infinite;
+        box-shadow: 0 0 5px rgba(255, 236, 179, 0.8);
+        z-index: 1;
+    }
+
+    .estrella.planeta {
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(#FBC02D, #FF8A65);
+        opacity: 0.7;
+        animation: flotar-planeta 25s linear infinite;
+        box-shadow: 0 0 15px rgba(251, 192, 45, 0.8);
+    }
+
+    @keyframes brillar {
+        0% { transform: translate(0, 0); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translate(100vw, -100vh); opacity: 0; }
+    }
+
+    @keyframes flotar-planeta {
+        0% { transform: translate(-50px, 50px) rotate(0deg); opacity: 0.5; }
+        50% { transform: translate(50px, -100px) rotate(180deg); opacity: 0.9; }
+        100% { transform: translate(-50px, 50px) rotate(360deg); opacity: 0.5; }
+    }
+
+    .layout {
+        width: 100%;
+        z-index: 2;
+    }
+
+    .center {
+        padding: 100px 40px 40px 40px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #EAEAEA;
+        position: relative;
+    }
+
+    h1 {
+        color: #FBC02D;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(251, 192, 45, 0.7);
+        position: relative;
+        z-index: 2;
+    }
+
+    .portada {
+        width: 200px;
+        height: 280px;
+        border-radius: 6px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        background-image: url('/desafio/images/principito.jpg');
+        background-size: cover;
+        background-position: center;
+        margin-bottom: 15px;
+        border: 3px solid #FF8A65;
+        position: relative;
+        z-index: 2;
+    }
+
+    p {
+        max-width: 700px;
+        line-height: 1.6;
+        color: #CFCFCF;
+        font-size: 1rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .capitulos {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        margin-top: 30px;
+        margin-bottom: 60px;
+        padding-bottom: 100px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .capitulo-nodo {
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
+        background: #FF8A65;
+        border: 3px solid #FBC02D;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        box-shadow: 0 0 15px rgba(255, 138, 101, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        font-size: 1.2rem;
+    }
+
+    .capitulo-nodo.locked {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #2980b9;
+        border-color: #A0A0A0;
+    }
+
+    .capitulo-nodo.locked::after {
+        content: "🌌";
+        position: absolute;
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+
+    .capitulo-nodo.leido {
+        background: #FBC02D;
+        color: #333;
+        transform: scale(1.1);
+        box-shadow: 0 0 20px #FBC02D;
+    }
+
+    .flecha {
+        color: #FBC02D;
+        margin: 6px 0;
+        font-size: 1.2rem;
+        opacity: 0.8;
+        animation: arrow-pulse 1s infinite alternate;
+    }
+
+    @keyframes arrow-pulse {
+        from { opacity: 0.5; }
+        to { opacity: 1; }
+    }
+
+    .sidebar {
+        width: 260px;
+        background: linear-gradient(180deg, #2c3e50, #1b2735);
+        border-left: 3px solid #FBC02D;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #fff;
+        border-top-left-radius: 25px;
+        border-bottom-left-radius: 25px;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        z-index: 10;
+        overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 8px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(251, 192, 45, 0.4); border-radius: 10px; }
+
+    .sidebar h2 {
+        text-align: center;
+        color: #FBC02D;
+        margin-bottom: 30px;
+        font-weight: 700;
+        font-size: 1.6rem;
+        letter-spacing: 1px;
+        text-shadow: 0 0 8px rgba(251, 192, 45, 0.5);
+    }
+
+    .sidebar ul { list-style: none; padding: 0; }
+
+    .sidebar li {
+        margin: 18px 0;
+        cursor: pointer;
+        color: #EAEAEA;
+        font-weight: 500;
+        font-size: 1.05rem;
+        padding: 10px 15px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        background: rgba(44, 62, 80, 0.3);
+    }
+
+    .sidebar li:hover {
+        color: #fff;
+        background: rgba(44, 62, 80, 0.5);
+        transform: translateX(-4px);
+    }
+
+    .footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-top: 20px;
+        opacity: 0.8;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: #F8F8F8;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 600px;
+        text-align: left;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        max-height: 80vh;
+        overflow-y: auto;
+        color: #222;
+    }
+
+    .modal-content h3 { color: #FF8A65; margin-bottom: 15px; text-align: center; }
+
+    .modal-content button {
+        background: #FF8A65;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .modal-content button:hover { background: #FF7043; }
+
+    .mensaje-motivacional {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #FF8A65;
+        color: #FBC02D;
+        padding: 15px 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        z-index: 200;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        border: 2px solid #FBC02D;
+    }
+
+    .mensaje-motivacional.show { display: block; opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="background-stars">
+  <div class="estrella" style="top: 10%; left: 30%; animation-delay: 1s;"></div>
+  <div class="estrella" style="top: 50%; left: 80%; animation-delay: 3s;"></div>
+  <div class="estrella" style="top: 90%; left: 10%; animation-delay: 5s;"></div>
+  <div class="estrella" style="top: 5%; left: 50%; animation-delay: 2s;"></div>
+  <div class="estrella" style="top: 85%; left: 70%; animation-delay: 4s;"></div>
+  <div class="estrella planeta" style="top: 30%; left: 60%; animation-delay: 7s;"></div>
+  <div class="estrella planeta" style="top: 70%; left: 40%; animation-delay: 10s; width:15px; height:15px;"></div>
+</div>
+
+<div class="layout">
+  <div class="center">
+    <div class="portada"></div>
+    <h1>El Principito</h1>
+    <p>Una aventura poética en el desierto que te invita a redescubrir lo esencial que es invisible a los ojos.</p>
+    <div class="capitulos" id="capitulosList"></div>
+  </div>
+
+  <aside class="sidebar">
+    <div>
+      <h2>LECTIO</h2>
+      <ul>
+        <li onclick="location.href='/api/inicio'">🏠 Inicio</li>
+        <li onclick="location.href='/api/libros'">📚 Biblioteca</li>
+        <li onclick="location.href='/api/historia_pensamiento'">💡 Historia del Pensamiento</li>
+        <li onclick="location.href='/api/logiado'">🏠 Volver a Lectio</li>
+      </ul>
+    </div>
+    <div class="footer">© 2025 Lectio</div>
+  </aside>
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content">
+    <h3 id="modal-title">Capítulo</h3>
+    <div id="modal-body" style="white-space:pre-wrap;color:#333"></div>
+    <button id="modal-button" onclick="handleModalButtonClick()">Completar</button>
+  </div>
+</div>
+
+<div id="mensaje" class="mensaje-motivacional"></div>
+
+<script>
+  const capitulos = [
+    `Capítulo 1: El aviador y el cordero.
+
+El narrador comienza explicando por qué dejó de dibujar a la edad de seis años: los adultos no entendían su dibujo de un elefante dentro de una boa. Años después, se convierte en aviador y sufre una avería en el desierto del Sahara, lejos de toda civilización. Allí, se encuentra con un pequeño muchacho de cabello dorado. El niño le pide algo inusual: "Por favor... ¡dibújame un cordero!". El aviador, desconcertado por la aparición del niño y su insólito pedido en medio de la nada, traza un cordero fallido tras otro. Finalmente, dibuja una caja. El niño exclama con asombro: "¡Es justo lo que quería! Mi cordero dormirá en ella." Este encuentro marca la diferencia fundamental entre la mente práctica del adulto y la imaginación pura de los niños.`,
+
+    `Capítulo 2: El planeta B-612 y la flor.
+
+El aviador descubre que el Principito viene de un planeta apenas más grande que una casa, el asteroide B-612. El Principito pasa sus días cuidándolo: limpia los volcanes (dos activos y uno extinto, que usa para calentar) y arranca los peligrosos **baobabs** antes de que sus raíces destruyan el planeta. Un día, una flor muy vanidosa y hermosa nace en el B-612. La **rosa**, con sus cuatro espinas y su orgullo, pronto se vuelve insoportable para el Principito. Su vanidad, sus quejas y sus demandas constantes lo hacen sentir infeliz. El Principito, confundido por las palabras y el orgullo de la flor, decide abandonar su planeta. En este capítulo se siembra el tema de la responsabilidad y el error de huir de las propias ataduras.`,
+
+    `Capítulo 3: El rey, el vanidoso y el bebedor.
+
+En su viaje, el Principito visita varios asteroides habitados por adultos singulares. Primero, un **Rey** que reina sobre nada y ordena solo cosas razonables. Luego, un **Vanidoso** que solo quiere ser admirado, sin importar si lo que dicen de él es verdad. Finalmente, un **Bebedor** que bebe para olvidar que le da vergüenza beber. El Principito se siente profundamente perplejo por la lógica de estos adultos, encontrando sus existencias absurdas y solitarias. Aprende que los adultos están tan ocupados con cosas serias e importantes que pierden el sentido de la belleza y de lo verdaderamente esencial.`,
+
+    `Capítulo 4: El farolero, el geógrafo y la Tierra.
+
+En el cuarto asteroide, el Principito conoce a un **Farolero** que obedece una consigna ridícula: debe encender y apagar su farol cada minuto. El Principito lo respeta porque, a diferencia de los otros, el Farolero se ocupa de algo distinto a sí mismo. Luego encuentra a un **Geógrafo** que sabe todo sobre su planeta pero no conoce ni la geografía de su propio hogar. El Geógrafo le aconseja visitar la Tierra, describiéndola como un planeta con "un centenar de once reyes... y setecientos mil geógrafos". El Principito llega a la Tierra (el séptimo planeta) y queda asombrado por su inmensidad y, más tarde, por el dolor que le causa descubrir que su rosa no era única al ver un jardín de miles de rosas.`,
+
+    `Capítulo 5: El zorro, la amistad y lo invisible.
+
+En la Tierra, el Principito conoce al **Zorro**, quien le enseña el significado de la amistad y la **domesticación**. El Zorro explica: "Tú no eres para mí todavía más que un muchachito semejante a cien mil muchachitos. Y no te necesito. Tampoco tú tienes necesidad de mí. No soy para ti más que un zorro semejante a cien mil zorros. Pero si me domesticas, tendremos necesidad el uno del otro." El Zorro le revela el secreto: **"Lo esencial es invisible a los ojos"** y le pide que sea responsable de su rosa, recordándole que el tiempo que perdió en su flor es lo que la hace importante. Finalmente, el Principito y el aviador se despiden. El Principito regresa a su planeta, y el aviador, ya adulto, mantiene la esperanza de volver a ver a su pequeño amigo en las estrellas.`
+  ];
+
+  const mensajesMotivacionales = [
+      "Has dado el primer paso: lo importante no es lo que dibujas, sino lo que ves. ¡Mantén tu mente de niño!",
+      "Recuerda tu rosa: el tiempo que pierdes en ella es lo que la hace importante. ¡Sé responsable de lo que has domesticado!",
+      "No seas como los adultos absurdos. La verdadera sabiduría no está en las cifras, sino en la conexión. ¡Sigue tu corazón!",
+      "Viaja, observa y honra a quien se ocupa de los demás, como el farolero. ¡El valor está en el deber cumplido!",
+      "Has aprendido el secreto del Zorro: **Lo esencial es invisible a los ojos**. ¡Mira con el corazón! 🧡"
+  ];
+
+  const LIBRO_ID = 'principito';
+  const cont = document.getElementById('capitulosList');
+  let currentReadingChapterIndex = -1;
+  let capitulosLeidos = [];
+
+  async function cargarProgreso() {
+      try {
+          const response = await fetch('/api/progreso/mi-progreso', {
+              method: 'GET',
+              credentials: 'include'
+          });
+
+          if (!response.ok) {
+              console.log('Usuario no autenticado');
+              desbloquearSiguientes();
+              return;
+          }
+
+          const data = await response.json();
+
+          if (data.capitulosPorLibro && data.capitulosPorLibro[LIBRO_ID]) {
+              capitulosLeidos = Array.from(data.capitulosPorLibro[LIBRO_ID]);
+          }
+
+          desbloquearSiguientes();
+      } catch (error) {
+          console.error('Error cargando progreso:', error);
+          desbloquearSiguientes();
+      }
+  }
+
+  async function guardarProgreso(capituloIndex) {
+      try {
+          const response = await fetch('/api/progreso/guardar-capitulo', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({
+                  libroId: LIBRO_ID,
+                  capitulo: capituloIndex,
+                  totalCapitulos: capitulos.length
+              })
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              console.log('✅ Capítulo guardado:', data);
+
+              if (capitulosLeidos.length === capitulos.length) {
+                  mostrarMensaje('🎉 ¡Felicitaciones! Has completado El Principito. +100 puntos 🌟');
+              }
+          }
+      } catch (error) {
+          console.error('Error guardando progreso:', error);
+      }
+  }
+
+  capitulos.forEach((txt, i) => {
+      const nodo = document.createElement('div');
+      nodo.className = 'capitulo-nodo locked';
+      nodo.textContent = i + 1;
+      nodo.onclick = () => openModal(i);
+      cont.appendChild(nodo);
+      if (i < capitulos.length - 1) {
+          const f = document.createElement('div');
+          f.className = 'flecha';
+          f.innerHTML = '&#8595;';
+          cont.appendChild(f);
+      }
+  });
+
+  function desbloquearSiguientes() {
+      const nodos = document.querySelectorAll('.capitulo-nodo');
+      nodos.forEach((n, i) => {
+          if (i === 0 || capitulosLeidos.includes(i - 1)) {
+              n.classList.remove('locked');
+          }
+          if (capitulosLeidos.includes(i)) n.classList.add('leido');
+      });
+  }
+
+  function openModal(i) {
+      const nodo = document.querySelectorAll('.capitulo-nodo')[i];
+      if (nodo.classList.contains('locked')) return;
+
+      document.getElementById('modal-title').innerText = `Capítulo ${i + 1}`;
+      document.getElementById('modal-body').innerText = capitulos[i];
+
+      const modalButton = document.getElementById('modal-button');
+      if (capitulosLeidos.includes(i)) {
+          modalButton.innerText = 'Cerrar';
+          modalButton.onclick = () => closeModal();
+      } else {
+          modalButton.innerText = 'Completar';
+          modalButton.onclick = () => handleModalButtonClick();
+      }
+
+      document.getElementById('modal').style.display = 'flex';
+      currentReadingChapterIndex = i;
+  }
+
+  function handleModalButtonClick() {
+      if (document.getElementById('modal-button').innerText === 'Completar') {
+          closeModal();
+      } else {
+          document.getElementById('modal').style.display = 'none';
+      }
+  }
+
+  function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+
+      const i = currentReadingChapterIndex;
+
+      if (i >= 0 && !capitulosLeidos.includes(i)) {
+          capitulosLeidos.push(i);
+          guardarProgreso(i);
+          mostrarMensaje(mensajesMotivacionales[i % mensajesMotivacionales.length]);
+
+          const nodo = document.querySelectorAll('.capitulo-nodo')[i];
+          nodo.classList.add('leido');
+          desbloquearSiguientes();
+      }
+
+      currentReadingChapterIndex = -1;
+  }
+
+  function mostrarMensaje(text) {
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = text;
+      mensaje.classList.add('show');
+      setTimeout(() => { mensaje.classList.remove('show'); }, 4000);
+  }
+
+  window.onload = cargarProgreso;
+</script>
+</body>
+</html>

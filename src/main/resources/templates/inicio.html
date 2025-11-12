@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lectio - Desafío de Lectura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Caveat&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Poppins', sans-serif;
+          display: flex;
+          min-height: 100vh;
+          background: linear-gradient(135deg, #e8f8f5 0%, #fdfdfd 100%);
+          color: #2c3e50;
+          padding-right: 290px;
+          overflow-x: hidden;
+        }
+
+        main {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          text-align: center;
+          padding: 40px;
+        }
+
+        .contenido {
+          z-index: 2;
+          max-width: 650px;
+          padding: 40px;
+          background: rgba(255, 255, 255, 0.88);
+          border-radius: 25px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(10px);
+          animation: fadeIn 1s ease forwards;
+          transition: all 0.4s ease;
+        }
+
+        .contenido:hover {
+          transform: scale(1.02);
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+          color: #27ae60;
+          font-size: 2.4rem;
+          margin-bottom: 14px;
+          letter-spacing: 1px;
+          font-weight: 700;
+        }
+
+        p {
+          color: #444;
+          line-height: 1.7;
+          margin-bottom: 28px;
+          font-size: 1.05rem;
+        }
+
+        /* ======= BOTONES ======= */
+        .btn-container {
+          display: flex;
+          gap: 15px;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .btn {
+          background: #27ae60;
+          color: #fff;
+          border: none;
+          padding: 14px 30px;
+          border-radius: 10px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .btn:hover {
+          background: #219150;
+          transform: translateY(-3px);
+          box-shadow: 0 6px 15px rgba(39, 174, 96, 0.35);
+        }
+
+        .btn-secondary {
+          background: #3498db;
+          box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary:hover {
+          background: #2980b9;
+          box-shadow: 0 6px 15px rgba(52, 152, 219, 0.35);
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        aside {
+          width: 250px;
+          background: linear-gradient(180deg, #2ecc71, #27ae60);
+          padding: 30px 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+          border-radius: 25px 0 0 25px;
+          z-index: 10;
+          position: fixed;
+          top: 0;
+          right: 0;
+          height: 100vh;
+          overflow-y: auto;
+        }
+
+        aside h2 {
+          text-align: center;
+          color: #fff;
+          margin-bottom: 30px;
+          font-weight: 700;
+          font-size: 1.6rem;
+          letter-spacing: 1px;
+        }
+
+        aside ul {
+          list-style: none;
+          padding: 0;
+        }
+
+        aside li {
+          margin: 18px 0;
+          cursor: pointer;
+          color: #fff;
+          font-weight: 500;
+          font-size: 1.05rem;
+          padding: 10px 15px;
+          border-radius: 12px;
+          transition: all 0.3s ease;
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        aside li:hover {
+          background: rgba(255, 255, 255, 0.25);
+          transform: translateX(-4px);
+        }
+
+        .footer {
+          text-align: center;
+          color: #ecf0f1;
+          font-size: 0.85rem;
+          padding-top: 10px;
+          opacity: 0.9;
+        }
+
+        .burbuja {
+          position: absolute;
+          background: radial-gradient(circle at 30% 30%, rgba(39, 174, 96, 0.5), rgba(39, 174, 96, 0.15));
+          border-radius: 50%;
+          opacity: 0.9;
+          bottom: -120px;
+          animation: flotar 10s linear infinite;
+          filter: blur(0.5px);
+        }
+
+        @keyframes flotar {
+          0% {
+            transform: translateY(0) scale(0.8);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.7;
+          }
+          50% {
+            transform: translateY(-50vh) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-110vh) scale(1.2);
+            opacity: 0;
+          }
+        }
+    </style>
+</head>
+
+<body>
+<main>
+    <div class="contenido">
+        <h1>Desafío de Lectura 📖</h1>
+        <p>Sumérgete en nuevas historias, descubre perspectivas únicas y haz de la lectura un hábito inspirador.
+            Aquí comienza tu viaje literario: cada página es una puerta hacia un mundo distinto,
+            y cada historia, una forma de crecer y soñar.</p>
+
+        <div class="btn-container">
+            <button class="btn" onclick="location.href='/api/libros'">
+                📚 Explorar Libros
+            </button>
+            <button class="btn btn-secondary" onclick="location.href='/api/logiado'">
+                🏠 Volver a Biblioteca
+            </button>
+        </div>
+    </div>
+
+    <div class="burbuja" style="width:80px; height:80px; left:10%; animation-delay:1s;"></div>
+    <div class="burbuja" style="width:100px; height:100px; left:25%; animation-delay:2.5s;"></div>
+    <div class="burbuja" style="width:60px; height:60px; left:45%; animation-delay:1.5s;"></div>
+    <div class="burbuja" style="width:120px; height:120px; left:65%; animation-delay:0.8s;"></div>
+    <div class="burbuja" style="width:90px; height:90px; left:85%; animation-delay:3s;"></div>
+    <div class="burbuja" style="width:50px; height:50px; left:35%; animation-delay:0.5s;"></div>
+    <div class="burbuja" style="width:70px; height:70px; left:75%; animation-delay:1s;"></div>
+</main>
+
+<aside>
+    <div>
+        <h2>LECTIO</h2>
+        <ul>
+            <li onclick="location.href='/api/libros'">📚 Biblioteca</li>
+            <li onclick="location.href='/api/historia_pensamiento'">💡 Historia del Pensamiento</li>
+            <li onclick="location.href='/api/logiado'">🏠 Volver a Inicio</li>
+        </ul>
+    </div>
+    <div class="footer">© 2025 Lectio</div>
+</aside>
+</body>
+</html>

@@ -101,10 +101,25 @@
             border-radius:12px;
             box-shadow:0 4px 10px rgba(0,0,0,0.1);
             transition:transform 0.3s;
+            position:relative;
         }
         .libro-item:hover { transform:translateY(-5px); }
         .libro-item h3 { font-size:1.1rem; margin-bottom:0.5rem; }
         .libro-item p { font-size:0.9rem; margin-bottom:0.3rem; color:#7f8c8d; }
+
+        /* Badge de stock */
+        .stock-badge {
+            position:absolute;
+            top:12px;
+            right:12px;
+            background:#2c3e50;
+            color:#fff;
+            padding:6px 10px;
+            border-radius:20px;
+            font-weight:600;
+            font-size:0.85rem;
+        }
+        .stock-badge.agotado { background:#e74c3c; }
 
         .btn-seleccionar {
             width:100%;
@@ -117,6 +132,10 @@
             transition:0.3s;
         }
         .btn-seleccionar:hover { background:#219150; }
+        .btn-seleccionar:disabled {
+            background:#bdc3c7;
+            cursor:not-allowed;
+        }
 
         /* Formulario flotante */
         #formulario-reserva {
@@ -126,7 +145,7 @@
             left:50%;
             transform:translate(-50%, -50%);
             width:90%;
-            max-width:400px;
+            max-width:420px;
             background:#fff;
             padding:1.5rem;
             border-radius:12px;
@@ -523,7 +542,8 @@
 <div id="formulario-reserva">
     <h2>Reservar Libro</h2>
     <form id="reserva-form" method="post">
-        <input type="hidden" id="libro-seleccionado" name="libro">
+        <input type="hidden" id="libro-id" name="libroId">
+        <input type="hidden" id="libro-titulo" name="libro">
         <input type="hidden" id="categoria-seleccionada" name="categoria">
 
         <div class="form-grupo">
@@ -574,6 +594,7 @@
         let currentPage = 1;
         let filteredBooks = [];
         let totalPages = 0;
+        let currentCategoria = null;
         const hoy = new Date().toISOString().split('T')[0];
         $('#fecha').attr('min', hoy);
 
@@ -622,11 +643,10 @@
             });
         }
 
-        // Cargar libros por categoría
-        $('#categoria').change(function(){
-            const categoria = $(this).val();
-            $('#categoria-seleccionada').val(categoria);
-            if(categoria){
+        // Función para cargar libros
+        function loadBooks(categoria) {
+            currentCategoria = categoria || null;
+            if(categoria) {
                 $.ajax({
                     url:'/api/cargarLibrosPorCategoria',
                     type:'GET',
@@ -643,6 +663,34 @@
                     }
                 });
             } else {
+                // Cargar todos los libros
+                $.ajax({
+                    url:'/api/cargarTodosLosLibros',
+                    type:'GET',
+                    success:function(data){
+                        todosLosLibros = data;
+                        filteredBooks = data;
+                        currentPage = 1;
+                        mostrarLibrosPaginados();
+                        renderPagination();
+                    },
+                    error:function(){
+                        mostrarMensaje('Error al cargar los libros', 'error');
+                    }
+                });
+            }
+        }
+
+        // Inicial: cargar todos los libros
+        loadBooks();
+
+        // Cargar libros por categoría
+        $('#categoria').change(function(){
+            const categoria = $(this).val();
+            $('#categoria-seleccionada').val(categoria);
+            if(categoria){
+                loadBooks(categoria);
+            } else {
                 $('#lista-libros').empty();
                 $('#pagination').empty();
                 $('#pageJumper').hide();
@@ -653,7 +701,7 @@
         $('#busqueda').keyup(function(){
             const term = $(this).val().toLowerCase();
             filteredBooks = todosLosLibros.filter(libro =>
-                libro.titulo.toLowerCase().includes(term) ||
+                (libro.titulo && libro.titulo.toLowerCase().includes(term)) ||
                 (libro.autor && libro.autor.toLowerCase().includes(term))
             );
             currentPage = 1;
@@ -675,19 +723,41 @@
             }
 
             librosPagina.forEach(libro => {
-                $lista.append(`
-                    <div class="libro-item" data-titulo="${libro.titulo}">
-                        <h3>${libro.titulo}</h3>
-                        ${libro.autor ? `<p><strong>Autor:</strong> ${libro.autor}</p>` : ''}
-                        ${libro.anioPublicacion ? `<p><strong>Año:</strong> ${libro.anioPublicacion}</p>` : ''}
-                        <button type="button" class="btn-seleccionar">Seleccionar</button>
+                // Asegurar propiedades
+                const stock = (typeof libro.stock === 'number') ? libro.stock : 0;
+                const tituloEsc = escapeHtml(libro.titulo || '');
+                const autorEsc = escapeHtml(libro.autor || '');
+                const categoriaEsc = escapeHtml(libro.categoria || '');
+                const id = libro.id || libro._id || '';
+
+                const stockBadge = stock > 0 ? `<div class="stock-badge">${stock}</div>` : `<div class="stock-badge agotado">Agotado</div>`;
+
+                const reservarBtn = stock > 0
+                    ? `<button class="btn-seleccionar btn-reservar" data-id="${id}" data-titulo="${tituloEsc}" data-categoria="${categoriaEsc}">Reservar</button>`
+                    : `<button class="btn-seleccionar" disabled>Sin stock</button>`;
+
+                const itemHtml = `
+                    <div class="libro-item" data-id="${id}">
+                        ${stockBadge}
+                        <h3>${tituloEsc}</h3>
+                        ${autorEsc ? `<p><strong>Autor:</strong> ${autorEsc}</p>` : ''}
+                        ${categoriaEsc ? `<p><strong>Categoría:</strong> ${categoriaEsc}</p>` : ''}
+                        <p><strong>Stock:</strong> <span class="stock-value">${stock > 0 ? stock : '0'}</span></p>
+                        ${reservarBtn}
                     </div>
-                `);
+                `;
+                $lista.append(itemHtml);
             });
 
-            $('.btn-seleccionar').off('click').on('click', function(){
-                const titulo = $(this).closest('.libro-item').data('titulo');
-                $('#libro-seleccionado').val(titulo);
+            // Asignar eventos a los botones de reserva
+            $('.btn-reservar').off('click').on('click', function(){
+                const id = $(this).data('id');
+                const titulo = $(this).data('titulo');
+                const categoria = $(this).data('categoria');
+
+                $('#libro-id').val(id);
+                $('#libro-titulo').val(titulo);
+                $('#categoria-seleccionada').val(categoria);
                 $('#formulario-reserva').fadeIn();
             });
         }
@@ -808,24 +878,56 @@
             $('#reserva-form')[0].reset();
         });
 
-        // Guardar reserva con AJAX
+        // Guardar reserva con control de stock
         $('#reserva-form').submit(function(e){
             e.preventDefault();
-            const datos = $(this).serialize();
+            const libroId = $('#libro-id').val();
+            const titulo = $('#libro-titulo').val();
+            const categoria = $('#categoria-seleccionada').val();
+            const idUsuario = $('#idUsuario').val();
+            const nombreCompleto = $('#nombreCompleto').val();
+            const correo = $('#correo').val();
+            const fecha = $('#fecha').val();
+
+            if(!libroId){
+                mostrarMensaje('Error: no seleccionado libro', 'error');
+                return;
+            }
+
+            // 1) Llamada para decrementar stock
             $.ajax({
-                url:'/api/guardarReservaUsuario',
-                type:'POST',
-                data:datos,
-                success:function(res){
+                url: '/api/reservar/' + encodeURIComponent(libroId),
+                type: 'POST'
+            }).done(function(responseHtml){
+                // 2) Guardar la reserva del usuario en el backend
+                $.ajax({
+                    url: '/api/guardarReservaUsuario',
+                    type: 'POST',
+                    data: {
+                        idUsuario: idUsuario,
+                        nombreCompleto: nombreCompleto,
+                        correo: correo,
+                        categoria: categoria,
+                        libro: titulo,
+                        fecha: fecha
+                    }
+                }).done(function(){
                     mostrarMensaje('Reserva realizada con éxito', 'exito');
                     $('#formulario-reserva').fadeOut();
                     $('#reserva-form')[0].reset();
-                },
-                error:function(xhr){
-                    let msg = 'Error al realizar la reserva';
+                    // recargar libros (mantener categoría si seleccionada)
+                    loadBooks(currentCategoria);
+                }).fail(function(xhr){
+                    // Si guardar reserva falla, intentar revertir stock sería ideal (no implementado).
+                    let msg = 'Error al guardar la reserva';
                     if(xhr.responseText) msg = xhr.responseText;
                     mostrarMensaje(msg, 'error');
-                }
+                    loadBooks(currentCategoria);
+                });
+            }).fail(function(xhr){
+                mostrarMensaje('No se pudo reservar: sin stock o error', 'error');
+                // recargar libros para mostrar estado real
+                loadBooks(currentCategoria);
             });
         });
 
@@ -839,8 +941,18 @@
             setTimeout(()=>{ $msg.fadeOut(); }, 3000);
         }
 
+        // Función de escape para seguridad al inyectar texto
+        function escapeHtml(text){
+            if(!text) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
     });
 </script>
-
 </body>
 </html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historia del Pensamiento - Lectio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Poppins',sans-serif;
+      /* AJUSTE CLAVE UNIFICADO: 250px (aside) + 40px (padding) = 290px */
+      padding-right: 290px;
+      display:flex;
+      min-height:100vh;
+      background:linear-gradient(135deg,#e8f8f5 0%,#fdfdfd 100%);
+      color:#2c3e50;
+      overflow-x:hidden;
+    }
+
+    main{
+      flex:1;
+      text-align:center;
+      /* AJUSTE CLAVE UNIFICADO */
+      padding: 40px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    h1{
+      color:#27ae60;
+      font-size:2.3rem;
+      margin-bottom:25px;
+      text-shadow:0 2px 6px rgba(0,0,0,0.1);
+      z-index:2;
+      position:relative;
+    }
+
+    p.intro{
+      font-size:1rem;
+      color:#2f3640;
+      max-width:750px;
+      margin:0 auto 45px auto;
+      line-height:1.6;
+      background:rgba(255,255,255,0.6);
+      padding:20px;
+      border-radius:20px;
+      backdrop-filter:blur(4px);
+      box-shadow:0 4px 10px rgba(0,0,0,0.05);
+      z-index:2;
+      position:relative;
+    }
+
+    .pensadores-grid{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:35px;
+      z-index:2;
+      position:relative;
+    }
+
+    .pensador{
+      background:rgba(255,255,255,0.9);
+      border-radius:18px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.08);
+      width:250px;
+      text-align:center;
+      padding:20px;
+      transition:transform 0.3s ease, box-shadow 0.3s ease;
+      cursor:pointer;
+      backdrop-filter:blur(6px);
+    }
+    .pensador:hover{
+      transform:translateY(-8px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.12);
+    }
+    .pensador img{
+      width:100%;
+      height:260px;
+      border-radius:12px;
+      object-fit:cover;
+      margin-bottom:10px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.1);
+    }
+    .pensador h3{
+      font-size:1rem;
+      color:#27ae60;
+      margin-bottom:5px;
+    }
+    .pensador p{
+      font-size:0.85rem;
+      color:#555;
+    }
+
+    /* ======= Barra lateral derecha UNIFICADA ======= */
+    aside{
+      width:250px; /* ANCHURA ORIGINAL UNIFICADA */
+      background:linear-gradient(180deg,#2ecc71,#27ae60);
+      padding:30px 20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.1);
+      border-radius:25px 0 0 25px;
+      z-index:10;
+      position:fixed;
+      top:0;
+      right:0;
+      height:100vh;
+      overflow-y:auto;
+    }
+    aside h2{
+      text-align:center;
+      color:#fff;
+      margin-bottom:30px;
+      font-weight:700;
+      font-size:1.6rem;
+      letter-spacing:1px;
+    }
+    aside ul{list-style:none;padding:0;}
+    aside li{
+      margin:18px 0;
+      cursor:pointer;
+      color:#fff;
+      font-weight:500;
+      font-size:1.05rem;
+      padding:10px 15px;
+      border-radius:12px;
+      transition:all 0.3s ease;
+      background:rgba(255,255,255,0.1);
+    }
+    aside li:hover{
+      background:rgba(255,255,255,0.25);
+      transform:translateX(-4px);
+    }
+    aside a{
+      text-decoration:none;
+      color:#fff;
+    }
+    .footer{
+      text-align:center;
+      color:#ecf0f1;
+      font-size:0.85rem;
+      opacity:0.9;
+    }
+
+    /* ======= Fondo dinámico ======= */
+    .burbuja{
+      position:absolute;
+      background:radial-gradient(circle at 30% 30%, rgba(39,174,96,0.45), rgba(39,174,96,0.15));
+      border-radius:50%;
+      opacity:0.8;
+      bottom:-120px;
+      animation:flotar 8s linear infinite;
+    }
+
+    @keyframes flotar{
+      0%{transform:translateY(0) scale(0.8);opacity:0;}
+      10%{opacity:0.7;}
+      50%{transform:translateY(-50vh) scale(1);opacity:1;}
+      100%{transform:translateY(-110vh) scale(1.2);opacity:0;}
+    }
+
+    /* ======= Modal ======= */
+    .modal{
+      display:none;
+      position:fixed;
+      z-index:100;
+      left:0;
+      top:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.6);
+      justify-content:center;
+      align-items:center;
+    }
+    .modal-content{
+      background:#fff;
+      padding:25px;
+      border-radius:15px;
+      max-width:500px;
+      text-align:center;
+      box-shadow:0 8px 24px rgba(0,0,0,0.1);
+    }
+    .modal-content h3{
+      color:#27ae60;
+      margin-bottom:15px;
+    }
+    .modal-content button{
+      background:#27ae60;
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      padding:10px 18px;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .modal-content button:hover{
+      background:#219150;
+    }
+
+    /* ======= Mensaje inspiracional ======= */
+    .mensaje{
+      position:fixed;
+      bottom:20px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#27ae60;
+      color:#fff;
+      padding:12px 25px;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
+      font-weight:500;
+      display:none;
+      max-width:90%;
+      text-align:center;
+      z-index:101;
+    }
+
+    @keyframes fadeIn{
+      from{opacity:0;transform:translateY(20px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    main, .pensadores-grid, .pensador{animation:fadeIn 1s ease;}
+  </style>
+</head>
+<body>
+
+<main>
+  <h1>Explora los Grandes Pensadores</h1>
+  <p class="intro">
+    Desde la filosofía antigua hasta las teorías modernas de la mente y la ciencia,
+    la historia del pensamiento humano nos invita a comprender cómo hemos intentado entender el mundo.
+    Haz clic en un pensador para inspirarte y reflexionar.
+  </p>
+
+  <div class="pensadores-grid">
+    <div class="pensador" onclick="mostrarMensaje('Sócrates nos recuerda que la verdadera sabiduría comienza con reconocer nuestra propia ignorancia.')">
+      <img src="images/socrates.jpg" alt="Sócrates">
+      <h3>Sócrates</h3>
+      <p>“Solo sé que no sé nada.”</p>
+    </div>
+    <div class="pensador" onclick="mostrarMensaje('Descartes nos enseña que reflexionar y cuestionar es el primer paso hacia la verdad.')">
+      <img src="images/descartes.jpg" alt="René Descartes">
+      <h3>René Descartes</h3>
+      <p>“Pienso, luego existo.”</p>
+    </div>
+    <div class="pensador" onclick="mostrarMensaje('Darwin nos inspira a observar, explorar y aceptar que el cambio es parte de la vida.')">
+      <img src="images/darwin.jpg" alt="Charles Darwin">
+      <h3>Charles Darwin</h3>
+      <p>Revolucionó la biología con su teoría de la evolución.</p>
+    </div>
+  </div>
+
+  <div class="burbuja" style="width:80px;height:80px;left:10%;animation-delay:1s;"></div>
+  <div class="burbuja" style="width:100px;height:100px;left:25%;animation-delay:2.5s;"></div>
+  <div class="burbuja" style="width:60px;height:60px;left:45%;animation-delay:1.5s;"></div>
+  <div class="burbuja" style="width:120px;height:120px;left:65%;animation-delay:0.8s;"></div>
+  <div class="burbuja" style="width:90px;height:90px;left:85%;animation-delay:3s;"></div>
+</main>
+
+<aside>
+  <div>
+    <h2>LECTIO</h2>
+    <ul>
+      <li onclick="showModal('categorias')">📚 Categorías</li>
+      <li onclick="showModal('reto')">🎯 Reto Filosófico</li>
+      <li onclick="window.location.href='inicio'">🏠 Inicio</li>
+      <li onclick="window.location.href='libros'">⬅ Regresar</li>
+    </ul>
+  </div>
+  <div class="footer">© 2025 Lectio</div>
+</aside>
+
+<div id="modal" class="modal" onclick="closeModal(event)">
+  <div class="modal-content">
+    <h3 id="modal-title"></h3>
+    <p id="modal-text"></p>
+    <button onclick="document.getElementById('modal').style.display='none'">Cerrar</button>
+  </div>
+</div>
+
+<div id="mensaje" class="mensaje"></div>
+
+<script>
+  function showModal(type){
+    const modal=document.getElementById('modal');
+    const title=document.getElementById('modal-title');
+    const text=document.getElementById('modal-text');
+
+    if(type==='categorias'){
+      title.textContent='Categorías del Pensamiento';
+      text.textContent='Filosofía, Ciencia, Ética, Psicología y Metafísica. Explora cómo cada disciplina busca entender la mente, la existencia y el conocimiento.';
+    } else if(type==='reto'){
+      title.textContent='Reto Filosófico del Día';
+      text.textContent='Reflexiona: “¿Ser feliz es una elección o una consecuencia?”. Escríbelo en tu diario y compártelo con alguien.';
+    }
+
+    modal.style.display='flex';
+  }
+
+  function closeModal(event){
+    if(event.target.id==='modal'){
+      document.getElementById('modal').style.display='none';
+    }
+  }
+
+  function mostrarMensaje(texto){
+    const mensaje=document.getElementById('mensaje');
+    mensaje.textContent=texto;
+    mensaje.style.display='block';
+    setTimeout(()=>{mensaje.style.display='none';},4500);
+  }
+</script>
+
+</body>
+</html>

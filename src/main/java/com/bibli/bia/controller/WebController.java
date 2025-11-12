@@ -185,17 +185,77 @@ public class WebController {
 
     @PostMapping("/reservar/{id}")
     public String reservarLibroFisico(@PathVariable String id, Model model) {
-        boolean reservado = libroFisicoService.reservarLibroFisico(id);
-        if (reservado) model.addAttribute("mensaje", "¡Reserva exitosa!");
-        else model.addAttribute("mensaje", "No hay stock disponible para reservar.");
+        try {
+            boolean reservado = libroFisicoService.reservarLibroFisico(id);
+
+            if (reservado) {
+                model.addAttribute("mensajeExito", "✅ ¡Reserva exitosa! El stock se ha actualizado correctamente.");
+            } else {
+                model.addAttribute("mensajeError", "⚠️ No hay stock disponible o el libro no existe.");
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al reservar libro físico: " + e.getMessage());
+            model.addAttribute("mensajeError", "❌ Ocurrió un error al procesar la reserva.");
+        }
+
+        // 🔄 Recargar lista de libros actualizada desde MongoDB
+        model.addAttribute("librosFisicos", libroFisicoService.obtenerTodosLosLibrosFisicos());
+        return "reservaLibro"; // nombre del template Thymeleaf
+    }
+
+
+    @PostMapping("/cancelar-reserva/{id}")
+    public String cancelarReservaLibroFisico(@PathVariable String id, Model model) {
+        try {
+            boolean cancelado = libroFisicoService.cancelarReservaLibroFisico(id);
+
+            if (cancelado) {
+                model.addAttribute("mensaje", "✅ Reserva cancelada. El stock se ha restablecido.");
+            } else {
+                model.addAttribute("mensaje", "⚠️ No hay reservas para cancelar o el libro no existe.");
+            }
+        } catch (Exception e) {
+            model.addAttribute("mensaje", "❌ Error al cancelar la reserva: " + e.getMessage());
+        }
+
+        // Recargar lista actualizada
         model.addAttribute("librosFisicos", libroFisicoService.obtenerTodosLosLibrosFisicos());
         return "reservaLibro";
     }
 
 
+
+
     @GetMapping("/carrito")
     public String carrito() {
         return "carrito";
+    }
+
+    @GetMapping("/inicio")
+    public String inicio() {
+        return "inicio";
+    }
+    @GetMapping("/libros")
+    public String libros() {
+        return "libros";
+    }
+
+    @GetMapping("/historia_pensamiento")
+    public String historia_pensamiento() {
+        return "historia_pensamiento";
+    }
+    @GetMapping("/desafio_principito")
+    public String desafio_principito() {
+        return "desafio_principito";
+    }
+    @GetMapping("/desafio_harrypotter")
+    public String desafio_harrypotter() {
+        return "desafio_harrypotter";
+    }
+    @GetMapping("/desafio_1984")
+    public String desafio_1984() {
+        return "desafio_1984";
     }
 
     @GetMapping("/librosPorCategoria/{categoria}")
@@ -304,8 +364,6 @@ public class WebController {
             return ResponseEntity.status(500).body("Hubo un error al agregar el libro");
         }
     }
-
-
 
 
     @GetMapping("/multas")
